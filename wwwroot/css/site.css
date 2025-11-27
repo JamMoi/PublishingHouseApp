@@ -7,6 +7,43 @@ html {
     font-size: 16px;
   }
 }
+.navbar ul li {
+    margin-right: 20px;
+}
+
+.navbar ul li a {
+        text-decoration: none;
+        color: #2a2a2a;
+        font-weight: bold;
+        transition: color 0.3s ease; 
+}
+    .navbar ul li a:hover {
+        color: #ff9900 !important;
+    }
+
+.container {
+    padding: 20px;
+}
+
+.welcome-container {
+    text-align: center;
+    margin-top: 50px;
+    background-color: #fffbdd;
+    border: 2px solid #ffcc00;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 0 10px rgba(255, 204, 0, 0.5);
+}
+
+.navbar {
+    background-color: #ffcc00; /* kirkas ja leikkisä väri */
+    padding:10px 20px;
+}
+.navbar-brand, .nav-link {
+    color: #333; /* tumma kontrastiväri */
+    font-weight: bold;
+}
+
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
   box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
@@ -18,7 +55,12 @@ html {
 }
 
 body {
-  margin-bottom: 60px;
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+    background-color: #fff8e7; /* lämmin, sarjakuvamainen tausta */
+    color: #333;
+    margin: 0;
+    padding: 0;
+    margin-bottom: 60px;
 }
 
 .form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
