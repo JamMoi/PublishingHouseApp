@@ -6,8 +6,12 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PublishingHouseApp.Models;
 
+// Tämä luokka kuvaa yhtä kirjailijaa tietokannassa.
+// EF Core käyttää tätä mallia Author-taulun luomiseen ja käsittelyyn.
 public partial class Author
 {
+    //Pääavain, joka tunnistaa yksilöllisesti jokaisen kirjailijan tietokannassa.
+    //Tämä arvo generoidaan automaattisesti, kun uusi kirjailija lisätään.
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)] // automaattisesti generoitu numero
     public int AuthorId { get; set; }
@@ -25,7 +29,9 @@ public partial class Author
 
     [DataType(DataType.Date)]
     public DateTime? Date { get; set; } = DateTime.Today;
-  
 
+    // Navigointiominaisuus
+    // Tämä sisältää kaikki kirjailijan kirjoittamat kirjat.
+    // Ef Core luo 1-to-many -suhteen: Author -> Books
     public virtual ICollection<Book> Books { get; set; } = new List<Book>();
 }

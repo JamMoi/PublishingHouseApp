@@ -10,7 +10,8 @@ var builder = WebApplication.CreateBuilder(args); //t‰ss‰ luodaan olio, johon li
 
 // lis‰t‰‰n palvelut sovellukseen
 builder.Services.AddControllersWithViews(); //rekisterˆid‰‰n MVC-palvelut, jotta voidaan k‰ytt‰‰ ohjaimia ja n‰kymi‰
-builder.Services.AddDbContext<PublishingHouseContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))); //specifying the server to connect to the database
+builder.Services.AddDbContext<PublishingHouseContext>(options => 
+options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))); //specifying the server to connect to the database
 
 var app = builder.Build(); //Rakennetaan varsinainen sovellus k‰ytt‰en edell‰ lis‰ttyj‰ palveluita.
 

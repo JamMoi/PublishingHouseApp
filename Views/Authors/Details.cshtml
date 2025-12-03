@@ -11,10 +11,10 @@
     <hr />
     <dl class="row">
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Firstname)
+            @Html.DisplayNameFor(model => model.Firstname) @*→ Näyttää kentän nimen mallin attribuuttien perusteella (esim. "Firstname").*@
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Firstname)
+            @Html.DisplayFor(model => model.Firstname)@*→ Näyttää Author-olion (kentän@) Firstname-arvon.*@
         </dd>
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.Surname)
@@ -49,6 +49,6 @@
     </dl>
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model?.AuthorId">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Edit" asp-route-id="@Model?.AuthorId">Edit</a> |@*Linkki muokkasunäkymään*@
+    <a asp-action="Index">Back to List</a> @*LInkki Back to LIst*@
 </div>

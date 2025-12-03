@@ -12,7 +12,7 @@ namespace PublishingHouseApp.Controllers
 {
     public class AuthorsController : Controller
     {
-        private readonly PublishingHouseContext db;
+        private readonly PublishingHouseContext db; //tietokantayhteys, Entity Framework -konteksti
 
         public AuthorsController(PublishingHouseContext context)
         {
@@ -20,17 +20,19 @@ namespace PublishingHouseApp.Controllers
         }
 
         // GET: Authors
+
+        //hakee kaikki kirjailijat tietokannasta ja näyttää ne listana
         public async Task<IActionResult> Index()
         {
             return View(await db.Authors.ToListAsync());
         }
 
         // GET: Authors/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(int? id) //näyttää yksittäisen kirjailijan tiedot. Jos id puuttuu tai kirjailijaa ei löydy -> virhe. Muuten palauttaa näkymän.
         {
             if (id == null)
             {
-                return NotFound();
+                return NotFound();//jos id puuttuu, palauttaa virheen
             }
 
             var author = await db.Authors
@@ -44,7 +46,7 @@ namespace PublishingHouseApp.Controllers
         }
 
         // GET: Authors/Create
-        public IActionResult Create()
+        public IActionResult Create() //näyttää lomakkeen uuden kirjailijan lisäämiseksi
         {
             return View();
         }
@@ -54,8 +56,8 @@ namespace PublishingHouseApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("AuthorId,Firstname,Surname,Email,PhoneNumber,Bio,Date")] Author author)
-        {
+        public async Task<IActionResult> Create([Bind("AuthorId,Firstname,Surname,Email,PhoneNumber,Bio,Date")] Author author) //kun lomake lähetetään, tarkistaa tiedot (ModelState.IsValid) ja lisää uuden kirjailijan tietokantaan. Tallentaa muutokset. Palaa listauskeen.
+        {                                                                                                                       //[Bind] rajoittaa, mitä kenttiä sallitaan lomakkeelta      
             if (ModelState.IsValid)
             {
                 db.Add(author);
@@ -67,7 +69,7 @@ namespace PublishingHouseApp.Controllers
         }
 
         // GET: Authors/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> Edit(int? id)//hakee muokattavan kirjailijan id:n perusteella
         {
             if (id == null)
             {
@@ -87,7 +89,7 @@ namespace PublishingHouseApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("AuthorId,Firstname,Surname,Email,PhoneNumber,Bio,Date")] Author author)
+        public async Task<IActionResult> Edit(int id, [Bind("AuthorId,Firstname,Surname,Email,PhoneNumber,Bio,Date")] Author author)//kun muokkaus lähetetään, tarkistaa että URL:n id ja lomakkeen id täsmäävät. Päivittää kirjailijan. tallentaa tietokantaan. käsittelee mahdollisen samanaikaisuusvirheen (DbUpdateConcurrencyException).
         {
             if (id != author.AuthorId)
             {
@@ -118,7 +120,7 @@ namespace PublishingHouseApp.Controllers
         }
 
         // GET: Authors/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        public async Task<IActionResult> Delete(int? id) //Näyttää poistovahvistusnäkymän.
         {
             if (id == null)
             {
@@ -136,14 +138,14 @@ namespace PublishingHouseApp.Controllers
         }
 
         // POST: Authors/Delete/5
-        [HttpPost, ActionName("Delete")]
+        [HttpPost, ActionName("Delete")]//// Poistetaan kirjailija, jos hänellä EI ole kirjoja
         [ValidateAntiForgeryToken]
 
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            //Haetaan kirjailijat mukaan lukien niiden kirjat
+            //Haetaan kirjailija ja hänen kirjat tietokannasta (include)
             var author = await db.Authors
-                .Include(a => a.Books) //varmistetaan että krijalista ladataan
+                .Include(a => a.Books) //lataaa kirjailijan sekä hänen kirjansa, varmistetaan että krijalista ladataan
                 .FirstOrDefaultAsync(a => a.AuthorId == id);
             if (author == null)
             {
@@ -178,7 +180,7 @@ namespace PublishingHouseApp.Controllers
         //    return RedirectToAction(nameof(Index));
         //}
 
-        private bool AuthorExists(int id)
+        private bool AuthorExists(int id)//Apumetodi->Tarkistaa onko kirjailija olemassa. Käytetään concurrency-virheen käsittelyssä.
         {
             return db.Authors.Any(e => e.AuthorId == id);
         }

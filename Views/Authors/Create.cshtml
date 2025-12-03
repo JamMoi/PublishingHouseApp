@@ -1,58 +1,99 @@
-﻿@model PublishingHouseApp.Models.Author
+﻿@model PublishingHouseApp.Models.Author // → Kertoo näkymälle, että se käsittelee yhden Author-olion tietoja.
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Create Author";
 }
 
-<h1>Create</h1>
+<style>
+    /* css. määrittelee teeman kortille ja painikkeelle */
+    .earth-header {
+        background-color: #8b5e3c; /* warm brown */
+        color: #fff;
+    }
 
-<h4>Author</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Firstname" class="control-label"></label>
-                <input asp-for="Firstname" class="form-control" />
-                <span asp-validation-for="Firstname" class="text-danger"></span>
+    .earth-button {
+        background-color: #a97455; /* softer clay/earth tone */
+        border-color: #a97455;
+        transition: 0.2s;
+    }
+
+    .earth-button:hover {
+        background-color: #8b5e3c;
+        border-color: #8b5e3c;
+    }
+</style>
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+
+            <div class="card shadow-sm border-0 rounded-3">
+                <div class="card-header earth-header text-center py-3">
+                    <h3 class="mb-0">Create New Author</h3>
+                </div>
+
+                <div class="card-body p-4">
+                    <form asp-action="Create" method="post"> @*!Lähettää lomakkeen AuthorControllerin Create POST -metodiin. *@
+                        @Html.AntiForgeryToken()
+
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                        @*Jokainen kenttä (Firstname, Surname, Email...)
+→ Luo syötekentän ja näyttää virheilmoituksen jos data ei ole kelvollinen.*@
+                        <div class="mb-3">
+                            <label asp-for="Firstname" class="form-label"></label>
+                            <input asp-for="Firstname" class="form-control" />
+                            <span asp-validation-for="Firstname" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Surname" class="form-label"></label>
+                            <input asp-for="Surname" class="form-control" />
+                            <span asp-validation-for="Surname" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Email" class="form-label"></label>
+                            <input asp-for="Email" class="form-control" />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="PhoneNumber" class="form-label"></label>
+                            <input asp-for="PhoneNumber" class="form-control" />
+                            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Bio" class="form-label"></label>
+                            <textarea asp-for="Bio" class="form-control" rows="3"></textarea>
+                            <span asp-validation-for="Bio" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Date" class="form-label"></label>
+                            <input asp-for="Date" type="date" class="form-control" />
+                            <span asp-validation-for="Date" class="text-danger"></span>
+                        </div>
+
+                        <button type="submit" class="btn earth-button w-100 py-2 mt-2">
+                            Save Author
+                        </button>
+
+                    </form>
+                </div>
+
+                <div class="card-footer earth-header text-center py-2">
+                    <a asp-action="Index" class="text-decoration-none text-white">← Back to List</a>
+                </div>
+
             </div>
-            <div class="form-group">
-                <label asp-for="Surname" class="control-label"></label>
-                <input asp-for="Surname" class="form-control" />
-                <span asp-validation-for="Surname" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Email" class="control-label"></label>
-                <input asp-for="Email" class="form-control" />
-                <span asp-validation-for="Email" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="PhoneNumber" class="control-label"></label>
-                <input asp-for="PhoneNumber" class="form-control" />
-                <span asp-validation-for="PhoneNumber" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Bio" class="control-label"></label>
-                <input asp-for="Bio" class="form-control" />
-                <span asp-validation-for="Bio" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Date" class="control-label"></label>
-                <input asp-for="Date" class="form-control" type="date" />
-                <span asp-validation-for="Date" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
+
+        </div>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

@@ -12,11 +12,11 @@
     <div class="col-md-4">
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="AuthorId" />
+            <input type="hidden" asp-for="AuthorId" /> @*→ Piilokenttä, joka lähettää ID:n, jotta oikea Author päivitetään.*@
             <div class="form-group">
-                <label asp-for="Firstname" class="control-label"></label>
+                <label asp-for="Firstname" class="control-label"></label> @*Kukin kenttä (Firstname, Email jne.)→ On täytetty automaattisesti Authorin nykyisillä arvoilla.*@
                 <input asp-for="Firstname" class="form-control" />
-                <span asp-validation-for="Firstname" class="text-danger"></span>
+                <span asp-validation-for="Firstname" class="text-danger"></span> @*→ Näyttää virheilmoitukset kenttien alla.*@
             </div>
             <div class="form-group">
                 <label asp-for="Surname" class="control-label"></label>
@@ -44,7 +44,7 @@
                 <span asp-validation-for="Date" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
+                <input type="submit" value="Save" class="btn btn-primary" /> @*→ Lähettää päivityksen AuthorControllerin Edit-menetelmään.*@
             </div>
         </form>
     </div>

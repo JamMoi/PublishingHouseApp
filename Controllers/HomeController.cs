@@ -2,7 +2,7 @@ using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using PublishingHouseApp.Models;
 
-namespace PublishingHouseApp.Controllers
+namespace PublishingHouseApp.Controllers // tämä  on oletus controlleri
 {
     public class HomeController : Controller
     {

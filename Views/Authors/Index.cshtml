@@ -1,15 +1,15 @@
-﻿@model IEnumerable<PublishingHouseApp.Models.Author>
-
+﻿@model IEnumerable<PublishingHouseApp.Models.Author> //tämä kertoo Razorille, että näkymä saa malliksi Author-olioiden listan.IEnumerable<Author>= luettelo kirjailijoista.
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Authors";@*Html sivun Otsikko*@
 }
 
-<h1>Index</h1>
+<h1>Authors</h1> @*Sivun näkyvä otsikko*@
 
 <p>
-    <a asp-action="Create">Create New</a>
+        <a asp-action="Create">Create New</a> @*Luo linkin, joka vie käyttäjän AuthorControllerin Create-metodiin.*@
 </p>
 <table class="table">
+    <!--Taulukko, joka näyttää Author-listan-->
     <thead>
         <tr>
             <th>
@@ -34,7 +34,8 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
+            @foreach (var item in Model) @*Author-lista, jonka controller lähetti näkymälle. foreach käy läpi jokaisen kirjailijan (Author-olion) listasta. item = yksi Author-olio kerralla.*@
+            { 
         <tr>
             <td>
                 @Html.DisplayFor(modelItem => item.Firstname)

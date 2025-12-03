@@ -12,7 +12,7 @@
     <hr />
     <dl class="row">
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Firstname)
+            @Html.DisplayNameFor(model => model.Firstname) @*Näyttää arvot vain lukutilassa, ilman muokkausta*@
         </dt>
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.Firstname)
@@ -49,9 +49,9 @@
         </dd>
     </dl>
     
-    <form asp-action="Delete">
-        <input type="hidden" asp-for="AuthorId" />
-        <input type="submit" value="Delete" class="btn btn-danger" /> |
-        <a asp-action="Index">Back to List</a>
+    <form asp-action="Delete"> @*Lähettää poistopyynnön AUthorControllerille*@
+        <input type="hidden" asp-for="AuthorId" /> @*Ähettää ID:n näkymättä käyttäjälle. Piilotettu kenttä, joka sisältää AuthorId:n*@
+        <input type="submit" value="Delete" class="btn btn-danger" /> |@*Poinike Delete , Suorittaa poistamisen*@
+        <a asp-action="Index">Back to List</a> @*Linkki takaisin Author-listaukseen*@
     </form>
 </div>
