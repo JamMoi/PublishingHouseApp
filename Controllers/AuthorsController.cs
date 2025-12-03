@@ -56,10 +56,11 @@ namespace PublishingHouseApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("AuthorId,Firstname,Surname,Email,PhoneNumber,Bio,Date")] Author author) //kun lomake lähetetään, tarkistaa tiedot (ModelState.IsValid) ja lisää uuden kirjailijan tietokantaan. Tallentaa muutokset. Palaa listauskeen.
+        public async Task<IActionResult> Create([Bind("AuthorId,Firstname,Surname,Email,PhoneNumber,Bio")] Author author) //kun lomake lähetetään, tarkistaa tiedot (ModelState.IsValid) ja lisää uuden kirjailijan tietokantaan. Tallentaa muutokset. Palaa listauskeen.
         {                                                                                                                       //[Bind] rajoittaa, mitä kenttiä sallitaan lomakkeelta      
             if (ModelState.IsValid)
             {
+                author.Date = DateTime.Today; //asettaa päivämäärän nykyhetkeen
                 db.Add(author);
                 await db.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
