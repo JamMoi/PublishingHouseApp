@@ -1,4 +1,7 @@
-﻿@model IEnumerable<PublishingHouseApp.Models.Author> //tämä kertoo Razorille, että näkymä saa malliksi Author-olioiden listan.IEnumerable<Author>= luettelo kirjailijoista.
+﻿@model IEnumerable<PublishingHouseApp.Models.Author> //tämä kertoo Razorille, että näkymä saa malliksi Author-olioiden listan.IEnumerable<Author>//= luettelo kirjailijoista. Tämä luettelo tulee suoraan controllerista-->return View(await db.Authors.ToListAsync());
+@*Taulukko näyttää kaikki kentät ja tekee linkit: Edit -> Authors/Edit/id
+Details -> Authors/Details/id
+Delete -> Authors/Delete/id. JOKAINEN NÄISTÄ LINKEISTÄ OHJAA SEURAAVAAN KONTROLLERIN METODIIN*@
 @{
     ViewData["Title"] = "Authors";@*Html sivun Otsikko*@
 }
@@ -30,6 +33,9 @@
             <th>
                 @Html.DisplayNameFor(model => model.Date)
             </th>
+             <th>
+                    @Html.DisplayNameFor(model => model.Books) @*Kirjat-kenttä, joka näyttää kirjailijan kirjat*@
+             </th>
             <th></th>
         </tr>
     </thead>

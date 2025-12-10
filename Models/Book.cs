@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Humanizer;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -11,11 +12,11 @@ public partial class Book
    [DatabaseGenerated(DatabaseGeneratedOption.Identity)] // automaattisesti generoitu BookId
     public int BookId { get; set; } //primary key
     [Required]
-    public int AuthorId { get; set; }
+    public int AuthorId { get; set; }// Viittaa Author-taulukkoon
 
-    public virtual Author? Author { get; set; }
+    public virtual Author? Author { get; set; }//Navigointiominaisuus Author-malliin (many-to-one-suhde).TARKISTA SEURAAVA??Author-ominaisuus mahdollistaa, että controller ja view voivat näyttää kirjailijan nimen, esim. item.Author.Firstname.Tämä luo relaation Book → Author(many-to-one).???
 
-    public string Isbn { get; set; } = null!;
+    public string Isbn { get; set; } = null!; //alla Kaikki kirjan ominaisuudet.
 
     [Required] 
     public string Title { get; set; } = null!;

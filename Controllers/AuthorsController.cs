@@ -24,11 +24,13 @@ namespace PublishingHouseApp.Controllers
         //hakee kaikki kirjailijat tietokannasta ja näyttää ne listana
         public async Task<IActionResult> Index()
         {
-            return View(await db.Authors.ToListAsync());
+            return View(await db.Authors.ToListAsync());//Hakee kaikki Author-tietueet tietokannasta. Lähettää ne Index.cshtml-viewille. View ottaa vastaan IEnumerable<Author> ja näyttää taulukon.
+            //kutsujetku: Browser → / Authors → Controller.Index() → Index.cshtml
         }
 
         // GET: Authors/Details/5
-        public async Task<IActionResult> Details(int? id) //näyttää yksittäisen kirjailijan tiedot. Jos id puuttuu tai kirjailijaa ei löydy -> virhe. Muuten palauttaa näkymän.
+        public async Task<IActionResult> Details(int? id) // details(int? id) tarkistaa, onko id annettu),hakee yksittäisen kirjailijan tiedot, ja lähettääs en Details.cshtml-sivulle. Jos id puuttuu tai kirjailijaa ei löydy -> virhe. Muuten palauttaa näkymän.
+        //Kutsuketju: linkki listasta --> details --> controlelri --> details.cshtml.
         {
             if (id == null)
             {
@@ -36,6 +38,7 @@ namespace PublishingHouseApp.Controllers
             }
 
             var author = await db.Authors
+                .Include(a => a.Books) //ladataan myös kirjailijan kirjat
                 .FirstOrDefaultAsync(m => m.AuthorId == id);
             if (author == null)
             {
@@ -46,7 +49,8 @@ namespace PublishingHouseApp.Controllers
         }
 
         // GET: Authors/Create
-        public IActionResult Create() //näyttää lomakkeen uuden kirjailijan lisäämiseksi
+        public IActionResult Create() //näyttää tyhjän lomakkeen uuden kirjailijan lisäämiseksi
+        //Kutsuketju: Index.cshtml → Create-linkki → Controller.Create() → Create.cshtml
         {
             return View();
         }
@@ -57,7 +61,9 @@ namespace PublishingHouseApp.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("AuthorId,Firstname,Surname,Email,PhoneNumber,Bio")] Author author) //kun lomake lähetetään, tarkistaa tiedot (ModelState.IsValid) ja lisää uuden kirjailijan tietokantaan. Tallentaa muutokset. Palaa listauskeen.
-        {                                                                                                                       //[Bind] rajoittaa, mitä kenttiä sallitaan lomakkeelta      
+        //vastaanottaa lomakkeesta Author-olion, Asettaa automaattiseti piävämäärän, Tallentaa Authorin tietokantaan, Ohjaa takaisin indeksiin.
+        //Kutsuketju: Create.cshtml(form POST) → Controller.Create(POST) → Save → Redirect(Index) ///[Bind] rajoittaa, mitä kenttiä sallitaan lomakkeelta
+        {
             if (ModelState.IsValid)
             {
                 author.Date = DateTime.Today; //asettaa päivämäärän nykyhetkeen
@@ -71,6 +77,7 @@ namespace PublishingHouseApp.Controllers
 
         // GET: Authors/Edit/5
         public async Task<IActionResult> Edit(int? id)//hakee muokattavan kirjailijan id:n perusteella
+        //Hakee muokattavan Authorin. Lähettää sen Edit.cshtml-sivulle.
         {
             if (id == null)
             {
@@ -91,6 +98,7 @@ namespace PublishingHouseApp.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("AuthorId,Firstname,Surname,Email,PhoneNumber,Bio,Date")] Author author)//kun muokkaus lähetetään, tarkistaa että URL:n id ja lomakkeen id täsmäävät. Päivittää kirjailijan. tallentaa tietokantaan. käsittelee mahdollisen samanaikaisuusvirheen (DbUpdateConcurrencyException).
+        //Tarkistaa ID:n ja ModelState. Päivittää Authorin.Tallentaa tietokantaan.Ohjaa Indexiin.
         {
             if (id != author.AuthorId)
             {
@@ -121,7 +129,7 @@ namespace PublishingHouseApp.Controllers
         }
 
         // GET: Authors/Delete/5
-        public async Task<IActionResult> Delete(int? id) //Näyttää poistovahvistusnäkymän.
+        public async Task<IActionResult> Delete(int? id) //hakee authorin ja  Näyttää poistovahvistusnäkymän.
         {
             if (id == null)
             {
@@ -146,14 +154,14 @@ namespace PublishingHouseApp.Controllers
         {
             //Haetaan kirjailija ja hänen kirjat tietokannasta (include)
             var author = await db.Authors
-                .Include(a => a.Books) //lataaa kirjailijan sekä hänen kirjansa, varmistetaan että krijalista ladataan
+                .Include(a => a.Books) //hakee kirjailijan sekä hänen kirjansa, varmistetaan että krijalista ladataan
                 .FirstOrDefaultAsync(a => a.AuthorId == id);
             if (author == null)
             {
                 return NotFound();
             }
 
-            //tarkastetaan , onko kirjailijalla kirjoja, Jos kirjailijalla on kirjoja estetään poisto
+            //tarkastetaan , onko kirjailijalla kirjoja, Jos kirjailijalla on kirjoja, estetään poisto
             if (author.Books.Any())
             {
                 //Lisätään virheilmoitus ModelStateen
@@ -167,7 +175,7 @@ namespace PublishingHouseApp.Controllers
             db.Authors.Remove(author);
             await db.SaveChangesAsync();
 
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Index));//ohjaa takaisin Indexiin
         }
         //public async Task<IActionResult> DeleteConfirmed(int id)
         //{

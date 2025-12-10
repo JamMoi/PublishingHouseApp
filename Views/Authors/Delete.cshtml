@@ -7,6 +7,7 @@
 <h1>Delete</h1>
 
 <h3>Are you sure you want to delete this?</h3>
+@Html.ValidationSummary(false, "", new { @class = "text-danger" })
 <div>
     <h4>Author</h4>
     <hr />
@@ -49,7 +50,7 @@
         </dd>
     </dl>
     
-    <form asp-action="Delete"> @*Lähettää poistopyynnön AUthorControllerille*@
+    <form asp-action="Delete">@*→ Lähettää POST-kutsun DeleteConfirmed-metodille (nimetty ActionName-attribuutilla).Lähettää poistopyynnön AUthorControllerille*@
         <input type="hidden" asp-for="AuthorId" /> @*Ähettää ID:n näkymättä käyttäjälle. Piilotettu kenttä, joka sisältää AuthorId:n*@
         <input type="submit" value="Delete" class="btn btn-danger" /> |@*Poinike Delete , Suorittaa poistamisen*@
         <a asp-action="Index">Back to List</a> @*Linkki takaisin Author-listaukseen*@

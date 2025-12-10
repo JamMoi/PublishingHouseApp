@@ -43,6 +43,10 @@ html {
     color: #333; /* tumma kontrastiv‰ri */
     font-weight: bold;
 }
+footer {
+    padding:20px 0 !important;
+    height: 10px;!important;
+}
 
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
@@ -93,4 +97,21 @@ body {
 
 .earth-link {
     color: #fff !important;
+}
+.map-container {
+    width: 100%;
+    height:350px;
+    position: relative;
+}
+.map-frame {
+    width: 100%;
+    height: 100%;
+    border: 0;
+}
+body {
+    background-image:
+    background-size: cover; /* Kuva skaalautuu koko taustalle */
+    background-repeat: no-repeat; /* Ei toistoa */
+    background-position: center; /* Keskitet‰‰n kuva */
+    background-attachment: fixed; /* Parallax-efekti: kuva pysyy paikallaan */
 }

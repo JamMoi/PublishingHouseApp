@@ -194,6 +194,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
 using PublishingHouseApp.Data;
 using PublishingHouseApp.Models;
 
@@ -206,7 +207,8 @@ public class BooksController : Controller
     }
 
     // GET: Books
-    // Hakee kaikki kirjat ja niiden kirjailijat (Include)
+    // Hakee kaikki kirjat tietokannasta. Include(b => b.Author) lataa myös kirjailijat, jotta näkymässä voidaan näyttää esimerkiksi kirjan tekijän nimi.
+    //Palauttaa Index-näkymän listalla.
     public async Task<IActionResult> Index()
     {
         var publishingHouseContext = db.Books.Include(b => b.Author);
@@ -214,8 +216,8 @@ public class BooksController : Controller
     }
 
     // GET: Books/Details/5
-    // Näyttää yhden kirjan tarkemmat tiedot
-    public async Task<IActionResult> Details(int? id)
+    // Näyttää yhden kirjan tarkemmat tiedot.
+    public async Task<IActionResult> Details(int? id)//Näyttää yksittäisen kirjan tiedot.Jos id puuttuu tai kirjaa ei löydy, palauttaa NotFound().Käyttää Include(a => a.Author) kirjailijan tietojen hakemiseen.
     {
         if (id == null) return NotFound();//jos id ei löydy
 
@@ -230,7 +232,7 @@ public class BooksController : Controller
 
     // GET: Books/Create
     // Näyttää kirjan luontilomakkeen ja täyttää kirjailija-dropdownin
-    public IActionResult Create()
+    public IActionResult Create() //Näyttää lomakkeen uuden kirjan lisäämiseksi.Täyttää Author-dropdownin, jossa näkyy "Etunimi Sukunimi" (ViewBag.AuthorId).Tämä dropdown auttaa käyttäjää valitsemaan kirjailijan, johon kirja liitetään.
     {
         // Luodaan listaus kirjailijoista dropdownia varten
         ViewBag.AuthorId = new SelectList(
@@ -251,6 +253,7 @@ public class BooksController : Controller
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create([Bind("AuthorId,Isbn,Title,Editor,PublishedDate,Edition,Genre,Language,Keywords,PageCount,Format,FilePath,CoverImageUrl,Price,IsAvailable")] Book book)
+        //Tallentaa uuden kirjan tietokantaan, jos lomakkeen tiedot ovat validit.Jos validointi epäonnistuu, Author-dropdown rakennetaan uudelleen.Redirecttaa onnistuneen lisäyksen jälkeen Index-näkymään.
     {
         // Tämä blokki tulostaa mahdolliset virheet konsoliin debuggausta varten
         if (!ModelState.IsValid)
@@ -286,7 +289,8 @@ public class BooksController : Controller
 
     // GET: Books/Edit/5
     //näyttää kirjan muokkausnäkymän
-    public async Task<IActionResult> Edit(int? id)
+    public async Task<IActionResult> Edit(int? id)//GET hakee kirjan ja näyttää muokkauslomakkeen.POST tallentaa muutokset tietokantaan.
+    //Käyttää try/catch DbUpdateConcurrencyExceptionin käsittelyyn, jos kirja poistettiin samaan aikaan, kun sitä muokattiin.
     {
         if (id == null) return NotFound();
 
@@ -347,7 +351,8 @@ public class BooksController : Controller
 
     // GET: Books/Delete/5
     //Näyttää kirjan poiston vahvistusnäkymän
-    public async Task<IActionResult> Delete(int? id)
+    public async Task<IActionResult> Delete(int? id)//GET näyttää vahvistusnäkymän kirjan poistolle.
+//POST poistaa kirjan tietokannasta ja redirecttaa Index-näkymään.
     {
         if (id == null) return NotFound();
 
@@ -376,7 +381,7 @@ public class BooksController : Controller
         return RedirectToAction(nameof(Index));
     }
 
-    // Tarkistaa onko kirja olemassa tietokannassa
+    // Tarkistaa tietokannasta, onko kirja olemassa. Käytetään muokkaus- ja poisto-operaatioiden concurrency-tarkistukseen.
     private bool BookExists(int id)
     {
         return db.Books.Any(e => e.BookId == id);

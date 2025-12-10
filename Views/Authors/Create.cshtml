@@ -1,5 +1,6 @@
 ﻿@model PublishingHouseApp.Models.Author // → Kertoo näkymälle, että se käsittelee yhden Author-olion tietoja.
-
+@*yhteys controlleriin
+Lomake lähettää POST-kutsun tänne:<form asp-action="Create" method="post"> TÄMÄ TARKOITTAA : POST /Authors/Create. Controller käsittelee tämän Create(POST)-metodissaan.*@
 @{
     ViewData["Title"] = "Create Author";
 }
@@ -71,7 +72,7 @@
 
                         <div class="mb-3">
                             <label asp-for="Date" class="form-label"></label>
-                            <input asp-for="Date" type="date" class="form-control" />
+                            <!-- <input asp-for="Date" type="date" class="form-control" />--> @*Päivämäärä tulee siis automaattisesti controllerin kautta.*@
                             <span asp-validation-for="Date" class="text-danger"></span>
                         </div>
 

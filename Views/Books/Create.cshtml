@@ -1,4 +1,4 @@
-﻿@model PublishingHouseApp.Models.Book
+﻿@model PublishingHouseApp.Models.Book//Lomake uuden kirjan lisäämiseen.Author-dropdown (select asp-for="AuthorId" asp-items="ViewBag.AuthorId") hakee kirjailijat controllerista.Kaikki kirjan kentät näkyvät syötteinä.Lomake POSTaa tiedot BooksController.Create-metodiin.
 
 @{
     ViewData["Title"] = "Create Book";

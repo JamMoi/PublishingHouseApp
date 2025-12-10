@@ -12,8 +12,8 @@ public partial class Author
 {
     //Pääavain, joka tunnistaa yksilöllisesti jokaisen kirjailijan tietokannassa.
     //Tämä arvo generoidaan automaattisesti, kun uusi kirjailija lisätään.
-    [Key]
-    [DatabaseGenerated(DatabaseGeneratedOption.Identity)] // automaattisesti generoitu numero
+    [Key] //pääavain
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)] // automaattisesti generoitu ID
     public int AuthorId { get; set; }
     [Required] 
 
@@ -32,6 +32,6 @@ public partial class Author
 
     // Navigointiominaisuus
     // Tämä sisältää kaikki kirjailijan kirjoittamat kirjat.
-    // Ef Core luo 1-to-many -suhteen: Author -> Books
+    // Ef Core luo 1-to-many -suhteen: Author -> Books. käyttää tätä Delete-logiikassa
     public virtual ICollection<Book> Books { get; set; } = new List<Book>();
 }
