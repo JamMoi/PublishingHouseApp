@@ -17,21 +17,29 @@ var app = builder.Build(); //Rakennetaan varsinainen sovellus käyttäen edellä li
 
 // HTTP pyyntöjen käsittelyn konfigurointi.
 //Kaikki seuraavat määritykset vaikuttavat siihen, miten sovellus vastaa selaimen pyyntöihin.
-
-if (!app.Environment.IsDevelopment())
+using (var scope = app.Services.CreateScope())
 {
-    app.UseExceptionHandler("/Home/Error"); // ohjee virheet error sivulle
+    var services = scope.ServiceProvider;
+
+    //Haetaan tietokantakonteksti
+
+    var context = services.GetRequiredService<PublishingHouseContext>();
+
+    // Kutsutaan DbInitializeria (lisää dummy-datan jos tietokanta tyhjä)
+    DbInitializer.Initialize(context);
+}
+    if (!app.Environment.IsDevelopment())
+{
+    app.UseExceptionHandler("/Home/Error"); // virheiden korjaus tuotannossa; ohjee virheet error sivulle
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts(); //käytetään HTTP Strict Transport Securityä, joka pakottaa selaimet käyttämään HTTPS:ää
 }
 
 app.UseHttpsRedirection();
+app.UseStaticFiles(); //kartoitus staattisille resursseille kuten kuville, CSS:lle ja JavaScriptille
 app.UseRouting();//Ottaa käyttöön reititysjärjestelmän (eli miten URLit ohjataan controllereille).
 
 app.UseAuthorization(); // Aktivoi mahdollisen autorisoinnin (vaikkei sovelluksessasi vielä ole rooleja tai kirjautumista).
-
-
-app.UseStaticFiles(); //kartoitus staattisille resursseille kuten kuville, CSS:lle ja JavaScriptille
 
 app.MapControllerRoute( //Eli kun käyttäjä menee selaimella osoitteeseen  https://localhost:xxxx,  sovellus ajaa: HomeController ? Index()
     name: "default",

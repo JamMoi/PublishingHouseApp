@@ -6,15 +6,15 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PublishingHouseApp.Models;
 
-// Tämä luokka kuvaa yhtä kirjailijaa tietokannassa.
-// EF Core käyttää tätä mallia Author-taulun luomiseen ja käsittelyyn.
-public partial class Author
+// Tämä luokka vastaa yhtä kirjailija -riviä tietokannassa.
+// EF Core käyttää tätä mallia Author-taulun luomiseen ja CRUD-OPERAATIOIHIN (Create, Read, Update, Delete).
+public partial class Author //partial tarkoittaa, että samaa luokkaa voidaan määritellä useassa tiedostossa (esim. automaattisesti generoitu EF Core -koodi ja oma koodi).
 {
     //Pääavain, joka tunnistaa yksilöllisesti jokaisen kirjailijan tietokannassa.
     //Tämä arvo generoidaan automaattisesti, kun uusi kirjailija lisätään.
-    [Key] //pääavain
+    [Key] // kertoo EF-.lle että tämä on pääavain
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)] // automaattisesti generoitu ID
-    public int AuthorId { get; set; }
+    public int AuthorId { get; set; }//yksilöllinen tunniste jokaiselle kirjailijalle.
     [Required] 
 
     public string Firstname { get; set; } = null!;
@@ -28,7 +28,7 @@ public partial class Author
     public string Bio { get; set; } = null!;
 
     [DataType(DataType.Date)]
-    public DateTime? Date { get; set; } = DateTime.Today;
+    public DateTime Date { get; set; } = DateTime.Today;
 
     // Navigointiominaisuus
     // Tämä sisältää kaikki kirjailijan kirjoittamat kirjat.

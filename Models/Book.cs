@@ -1,12 +1,12 @@
-﻿using Humanizer;
+﻿using Humanizer;//tarjoaa metodeja merkkijonojen käsittelyyn, kuten muuntamaan tekstiä eri muotoihin (esim.päivämäärät monikko, isomuoto jne.).
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;//mahdollistaa attribuutit, kuten [Key], [Required].
+using System.ComponentModel.DataAnnotations.Schema;//attribuutit, jotka vaikuttavat tietokantaan, esim. [DatabaseGenerated].
 
 namespace PublishingHouseApp.Models;
 
-public partial class Book
+public partial class Book //Book-luokka edustaa tietokannan Book-taulua.
 {
    [Key]
    [DatabaseGenerated(DatabaseGeneratedOption.Identity)] // automaattisesti generoitu BookId
@@ -14,7 +14,7 @@ public partial class Book
     [Required]
     public int AuthorId { get; set; }// Viittaa Author-taulukkoon
 
-    public virtual Author? Author { get; set; }//Navigointiominaisuus Author-malliin (many-to-one-suhde).TARKISTA SEURAAVA??Author-ominaisuus mahdollistaa, että controller ja view voivat näyttää kirjailijan nimen, esim. item.Author.Firstname.Tämä luo relaation Book → Author(many-to-one).???
+    public virtual Author? Author { get; set; }//Navigointiominaisuus Author-malliin (many-to-one-suhde).Author-ominaisuus mahdollistaa, että controller ja view voivat näyttää kirjailijan nimen, esim. item.Author.Firstname.Tämä luo relaation Book → Author(many-to-one).???
 
     public string Isbn { get; set; } = null!; //alla Kaikki kirjan ominaisuudet.
 

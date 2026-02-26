@@ -1,28 +1,29 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc; //Tarjoaa MVC:n Controller- ja ActionResult-luokat
+using Microsoft.AspNetCore.Mvc.Rendering;//Auttaa luomaan HTML-elementtejä Razorissa (esim. <select> listoja).
+using Microsoft.EntityFrameworkCore;//Tarjoaa Entity Framework Core -toiminnallisuudet tietokantakyselyihin ja -muutoksiin.
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.Blazor;
+using PublishingHouseApp.Data;//tietokantayhteys, DbContext-luokka
+using PublishingHouseApp.Models;//Sovelluksen tietomallit, kuten Author ja Book
+using System;//Perus .NET -toiminnallisuudet(Listat, päivämäärät, LINQ, jne.)
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using PublishingHouseApp.Data;
-using PublishingHouseApp.Models;
 
 namespace PublishingHouseApp.Controllers
 {
     public class AuthorsController : Controller
     {
-        private readonly PublishingHouseContext db; //tietokantayhteys, Entity Framework -konteksti
+        private readonly PublishingHouseContext db; //tietokantayhteys, Entity Framework -konteksti.
+        //db on tietokantayhteys, jota käytetään Author- ja Book-tietojen hakemiseen ja tallentamiseen.
 
-        public AuthorsController(PublishingHouseContext context)
+        public AuthorsController(PublishingHouseContext context)//PublishingHouseContext injektoidaan automaattisesti (dependency injection).
         {
-            db = context;
+            db = context; //Tallennetaan db-muuttujaan, jota controllerin metodit käyttävät.
         }
 
         // GET: Authors
 
-        //hakee kaikki kirjailijat tietokannasta ja näyttää ne listana
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index() //// Index()-metodi hakee kaikki kirjailijat tietokannasta ja Palauttaa listan Index.cshtml-Viewille. 
         {
             var authors = await db.Authors.Include(a => a.Books).ToListAsync(); //ladataan myös kirjailijoiden kirjat
             return View(authors);                                               //Hakee kaikki Author-tietueet tietokannasta. Lähettää ne Index.cshtml-viewille. View ottaa vastaan IEnumerable<Author> ja näyttää taulukon.
@@ -51,7 +52,8 @@ namespace PublishingHouseApp.Controllers
         }
 
         // GET: Authors/Create
-        public IActionResult Create() //näyttää tyhjän lomakkeen uuden kirjailijan lisäämiseksi
+
+        public IActionResult Create() // näyttää tyhjän lomakkeen uuden kirjailijan lisäämiseksi.
         //Kutsuketju: Index.cshtml → Create-linkki → Controller.Create() → Create.cshtml
         {
             return View();
@@ -62,14 +64,14 @@ namespace PublishingHouseApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("AuthorId,Firstname,Surname,Email,PhoneNumber,Bio")] Author author) //kun lomake lähetetään, tarkistaa tiedot (ModelState.IsValid) ja lisää uuden kirjailijan tietokantaan. Tallentaa muutokset. Palaa listauskeen.
+        public async Task<IActionResult> Create([Bind("AuthorId,Firstname,Surname,Email,PhoneNumber,Bio")] Author author)// KÄSITTELEE TALLENNUKSEN. kun lomake lähetetään, tarkistaa tiedot (ModelState.IsValid) ja lisää uuden kirjailijan tietokantaan. Tallentaa muutokset. Palaa listauskeen.
         //vastaanottaa lomakkeesta Author-olion, Asettaa automaattiseti piävämäärän, Tallentaa Authorin tietokantaan, Ohjaa takaisin indeksiin.
         //Kutsuketju: Create.cshtml(form POST) → Controller.Create(POST) → Save → Redirect(Index) ///[Bind] rajoittaa, mitä kenttiä sallitaan lomakkeelta
         {
             if (ModelState.IsValid)
             {
                 author.Date = DateTime.Today; //asettaa päivämäärän nykyhetkeen
-                db.Add(author);
+                db.Add(author);              //lisää uuden author-olion tietokantakontekstiin
                 await db.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
@@ -77,7 +79,7 @@ namespace PublishingHouseApp.Controllers
             return View(author);
         }
 
-        // GET: Authors/Edit/5
+        // GET: Authors/Edit/5 
         public async Task<IActionResult> Edit(int? id)//hakee muokattavan kirjailijan id:n perusteella
         //Hakee muokattavan Authorin. Lähettää sen Edit.cshtml-sivulle.
         {
@@ -99,8 +101,9 @@ namespace PublishingHouseApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        //TÄMÄ EDIT(POST) METODI KÄSITTELEE EDIT.CSHTML-LOMAKKEEN "SAVE" (VIEW) painikkeen PAINALLUKSEN.
         public async Task<IActionResult> Edit(int id, [Bind("AuthorId,Firstname,Surname,Email,PhoneNumber,Bio,Date")] Author author)//kun muokkaus lähetetään, tarkistaa että URL:n id ja lomakkeen id täsmäävät. Päivittää kirjailijan. tallentaa tietokantaan. käsittelee mahdollisen samanaikaisuusvirheen (DbUpdateConcurrencyException).
-        //Tarkistaa ID:n ja ModelState. Päivittää Authorin.Tallentaa tietokantaan.Ohjaa Indexiin.
+        //Tarkistaa URL:ssa olevan ID:n ja lomakkeessa olevan ID:n. ModelStatessa tarkistaa että pakoslliset kentät on näytetty, tietotyypit oikein ja dataannotations säännöt täyttyvät. Päivittää Authorin.Tallentaa tietokantaan.Ohjaa Indexiin.
         {
             if (id != author.AuthorId)
             {
@@ -111,21 +114,21 @@ namespace PublishingHouseApp.Controllers
             {
                 try
                 {
-                    db.Update(author);
-                    await db.SaveChangesAsync();
+                    db.Update(author);      //Entity Framework merkitsee author-olion muokatuksi
+                    await db.SaveChangesAsync();//tallentaa muutokset tietokantaan
                 }
-                catch (DbUpdateConcurrencyException)
+                catch (DbUpdateConcurrencyException) //käsittelee samanaikaisuusvirheen esi. jos toinen käyttäjä on muokannut samaa kirjailijaa
                 {
-                    if (!AuthorExists(author.AuthorId))
-                    {
-                        return NotFound();
+                    if (!AuthorExists(author.AuthorId)) //tarkistaa onko kirjailija edelleen olemassa
+                    { 
+                        return NotFound(); //jos ei ole, palauttaa NotFound
                     }
-                    else
+                    else //muussa tapauksessa heittää virheen uudelleen (KEHITYSVAIHEESSA!?)
                     {
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Index)); //Onnistuneen tallennuksen jälkeen ohjaa takaisin Indexiin, jossa näkyy päivitetty lista.
             }
             return View(author);
         }
@@ -151,6 +154,8 @@ namespace PublishingHouseApp.Controllers
         // POST: Authors/Delete/5
         [HttpPost, ActionName("Delete")]//// Poistetaan kirjailija, jos hänellä EI ole kirjoja
         [ValidateAntiForgeryToken]
+
+        //TÄMÄ DELETE(POST) METODI KÄSITTELEE DELETE.CSHTML-LOMAKKEEN (VIEW) "DELETE" NAPIN PAINALLUKSEN.
 
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
@@ -179,18 +184,7 @@ namespace PublishingHouseApp.Controllers
 
             return RedirectToAction(nameof(Index));//ohjaa takaisin Indexiin
         }
-        //public async Task<IActionResult> DeleteConfirmed(int id)
-        //{
-        //    var author = await db.Authors.FindAsync(id);
-        //    if (author != null)
-        //    {
-        //        db.Authors.Remove(author);
-        //    }
-
-        //    await db.SaveChangesAsync();
-        //    return RedirectToAction(nameof(Index));
-        //}
-
+       
         private bool AuthorExists(int id)//Apumetodi->Tarkistaa onko kirjailija olemassa. Käytetään concurrency-virheen käsittelyssä.
         {
             return db.Authors.Any(e => e.AuthorId == id);

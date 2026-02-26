@@ -13,7 +13,7 @@
     <hr />
     <dl class="row">
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Firstname) @*Näyttää arvot vain lukutilassa, ilman muokkausta*@
+            @Html.DisplayNameFor(model => model.Firstname) @*Kaikki model => model.Something viittaukset käyttävät tätä olioa.Näyttää arvot vain lukutilassa, ilman muokkausta*@
         </dt>
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.Firstname)

@@ -115,3 +115,39 @@ body {
     background-position: center; /* Keskitet‰‰n kuva */
     background-attachment: fixed; /* Parallax-efekti: kuva pysyy paikallaan */
 }
+/* Pallojen ulkoasu */
+.carousel-indicators-custom button {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background-color: #555;
+    border: none;
+    margin: 0 5px;
+    transition: background-color 0.3s;
+}
+
+    .carousel-indicators-custom button.active {
+        background-color: #007bff; /* Bootstrapin sininen */
+    }
+
+/* Kuvien responsiivisuus */
+.carousel-item img {
+    max-height: 400px;
+    width: auto;
+    object-fit: contain;
+}
+
+/* Tekstin tausta hieman l‰pin‰kyv‰ksi, jos kuva on tummempi */
+.carousel-item .mt-3 {
+    background-color: rgba(255, 255, 255, 0.85);
+    display: inline-block;
+    padding: 10px 15px;
+    border-radius: 5px;
+}
+
+/* Nuolet hieman isommaksi ja helpommin klikattavaksi */
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+    width: 35px;
+    height: 35px;
+}

@@ -8,7 +8,7 @@ namespace PublishingHouseApp.Controllers
 {
     public class ContactController : Controller
     {
-        public IActionResult Index() //näyttää lomakkeen 
+        public IActionResult Index() // Vastaa GET pyyntöön, näyttää lomakkeen 
         {
             return View();
         }

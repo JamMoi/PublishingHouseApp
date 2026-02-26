@@ -22,6 +22,6 @@ namespace PublishingHouseApp.Models
         public string Message { get; set; }
 
         [Display(Name = "Attach your script")]
-        public IFormFile? File { get; set; }//Mahdollistaa tiedoston liittämisen lomakkeeseen.
+        public IFormFile? File { get; set; }//Mahdollistaa tiedoston liittämisen lomakkeeseen. IFormFile on asp.net coren tarjoama tiedostotyyppi.
     }
 }
