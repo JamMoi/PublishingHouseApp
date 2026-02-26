@@ -24,8 +24,10 @@ namespace PublishingHouseApp.Controllers
         //hakee kaikki kirjailijat tietokannasta ja näyttää ne listana
         public async Task<IActionResult> Index()
         {
-            return View(await db.Authors.ToListAsync());//Hakee kaikki Author-tietueet tietokannasta. Lähettää ne Index.cshtml-viewille. View ottaa vastaan IEnumerable<Author> ja näyttää taulukon.
-            //kutsujetku: Browser → / Authors → Controller.Index() → Index.cshtml
+            var authors = await db.Authors.Include(a => a.Books).ToListAsync(); //ladataan myös kirjailijoiden kirjat
+            return View(authors);                                               //Hakee kaikki Author-tietueet tietokannasta. Lähettää ne Index.cshtml-viewille. View ottaa vastaan IEnumerable<Author> ja näyttää taulukon.
+                                                                                //kutsujetku: Browser → / Authors → Controller.Index() → Index.cshtml
+
         }
 
         // GET: Authors/Details/5
