@@ -2,31 +2,74 @@ using Microsoft.EntityFrameworkCore; //EF Core -kirjasto tietokantayhteyksiä var
 using Microsoft.Extensions.Options; //ei ehkä tarvita tässä, mutta usein hyödyllinen
 using PublishingHouseApp.Data; //Jotta voidaan käytää omaa tietokantakontekstia PublishingHouseContext
 using PublishingHouseApp.Models; //Jotta voidaan käyttää tietokantamalleja, kuten Book, Author jne.
+using Microsoft.AspNetCore.Identity;
+
 
 //yllä tuodaan tarvittavat kirjastot projektiin
 
 
 var builder = WebApplication.CreateBuilder(args); //tässä luodaan olio, johon lisätään palvelut (kuten tietokanta, MVC.jne) joka rakentaa web-sovelluksen
 
+
 // lisätään palvelut sovellukseen
 builder.Services.AddControllersWithViews(); //rekisteröidään MVC-palvelut, jotta voidaan käyttää ohjaimia ja näkymiä
 builder.Services.AddDbContext<PublishingHouseContext>(options => 
 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))); //specifying the server to connect to the database
 
+// Idnentity Frameworkin ja ASP.NET Identityn konfigurointi
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+{
+    options.Password.RequireDigit = true;
+    options.Password.RequireLowercase = true;
+    options.Password.RequireUppercase = false;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequiredLength = 6;
+
+    options.SignIn.RequireConfirmedAccount = false;
+})
+.AddEntityFrameworkStores<PublishingHouseContext>()
+.AddDefaultTokenProviders();
+
+builder.Services.AddRazorPages();
+
+
 var app = builder.Build(); //Rakennetaan varsinainen sovellus käyttäen edellä lisättyjä palveluita.
 
-// HTTP pyyntöjen käsittelyn konfigurointi.
-//Kaikki seuraavat määritykset vaikuttavat siihen, miten sovellus vastaa selaimen pyyntöihin.
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
 
-    //Haetaan tietokantakonteksti
+    var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+    var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
 
+    string[] roles = { "Admin", "User" };
+
+    foreach (var role in roles)
+    {
+        if (!await roleManager.RoleExistsAsync(role))
+        {
+            await roleManager.CreateAsync(new IdentityRole(role));
+        }
+    }
+
+    var adminEmail = "admin@test.com";
+    var adminUser = await userManager.FindByEmailAsync(adminEmail);
+
+    if (adminUser != null)
+    {
+        if (!await userManager.IsInRoleAsync(adminUser, "Admin"))
+        {
+            await userManager.AddToRoleAsync(adminUser, "Admin");
+        }
+    }
+}
+// Dummy-data
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
     var context = services.GetRequiredService<PublishingHouseContext>();
-
-    // Kutsutaan DbInitializeria (lisää dummy-datan jos tietokanta tyhjä)
     DbInitializer.Initialize(context);
+
 }
     if (!app.Environment.IsDevelopment())
 {
@@ -39,12 +82,17 @@ app.UseHttpsRedirection();
 app.UseStaticFiles(); //kartoitus staattisille resursseille kuten kuville, CSS:lle ja JavaScriptille
 app.UseRouting();//Ottaa käyttöön reititysjärjestelmän (eli miten URLit ohjataan controllereille).
 
+app.UseAuthentication();
 app.UseAuthorization(); // Aktivoi mahdollisen autorisoinnin (vaikkei sovelluksessasi vielä ole rooleja tai kirjautumista).
 
 app.MapControllerRoute( //Eli kun käyttäjä menee selaimella osoitteeseen  https://localhost:xxxx,  sovellus ajaa: HomeController ? Index()
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}")
-    .WithStaticAssets();
+    pattern: "{controller=Home}/{action=Index}/{id?}");
+
+
+app.MapRazorPages();
+
+
 
 //käynnistää sovelluksen ja alkaa kuunnella HTTP-pyyntöjä
 app.Run();

@@ -1,43 +1,47 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using PublishingHouseApp.Models;
-using Microsoft.EntityFrameworkCore; // Entity Framework Core -k‰skyjen k‰yttˆ‰ varten, kuten ToListAsync, Include( jen) navigointiominaisuuksien lataamiseen.
+using Microsoft.EntityFrameworkCore; // Entity Framework Core -k‰skyjen k‰yttˆ‰ varten, kuten ToListAsync ja Include
 using PublishingHouseApp.Data;       // DbContext sijaitsee t‰‰ll‰
 
-namespace PublishingHouseApp.Controllers // t‰m‰  on oletus controlleri
+namespace PublishingHouseApp.Controllers // t‰m‰ on oletuscontrolleri
 {
     public class HomeController : Controller
     {
-        private readonly PublishingHouseContext context; // DbContext-luokan olio, joka tarjoaa p‰‰syn tietokantaan. siis t‰m‰n kautta haetaan data.
+        private readonly PublishingHouseContext context; // DbContext-luokan olio, jonka kautta haetaan data tietokannasta
         private readonly ILogger<HomeController> logger;
-        public HomeController(PublishingHouseContext context, ILogger<HomeController> logger) //Dependency Injection - ASP.NET Core antaa kontekstin automaattisestikonstruktori, joka ottaa DbContext-olion parametrina ja tallentaa sen luokan kentt‰‰n.
+
+        public HomeController(PublishingHouseContext context, ILogger<HomeController> logger) //Dependency Injection
         {
             this.context = context;
             this.logger = logger;
         }
-    
-        public async Task<IActionResult> Index() // T‰m‰ hakee kirjat carouselia varten
 
+        public async Task<IActionResult> Index() // T‰m‰ hakee kirjat carouselia varten
         {
             // Haetaan vain saatavilla olevat kirjat
             var latestBooks = await context.Books
-            .Where(b => b.IsAvailable)// N‰ytet‰‰n vain myynniss‰ olevat
-            .OrderByDescending(b => b.PublishedDate)//Uusimmat ensin
-            .Take(5)//otetaan vain 5 uusinta kirjaa
-            .ToListAsync(); //Hakee kaikki kirjat tietokannasta ja lataa niihin liittyv‰t Author-tiedot (Include) tehokkaasti yhdell‰ kyselyll‰.
+                .Include(b => b.Author) //Ladataan mukaan myˆs kirjailijan tiedot
+                .Where(b => b.IsAvailable) //N‰ytet‰‰n vain myynniss‰ olevat kirjat
+                .OrderByDescending(b => b.PublishedDate) //Uusimmat ensin
+                .Take(5) //Otetaan vain 5 uusinta kirjaa
+                .ToListAsync(); //Suoritetaan kysely tietokantaan
 
-            return View(latestBooks);   //L‰hett‰‰ haetut kirjat n‰kym‰‰n Index-sivulle. N‰kym‰ odottaa List<Book>-mallia, joka sis‰lt‰‰ uusimmat saatavilla olevat kirjat.
-        }
-        public IActionResult Privacy()
-        {
-            return View();
+            return View(latestBooks); //L‰hett‰‰ haetut kirjat n‰kym‰‰n Index-sivulle
         }
 
-        [ResponseCache(Duration = 0,
-                       Location = ResponseCacheLocation.None,
-                       NoStore = true)]
-        public IActionResult Error()
-        {
+        public IActionResult Privacy() //public = metodi on julkinen, eli sit‰ voidaan kutsua luokan ulkopuolelta
+                                       //IActionResult = metodin palautustyyppi. Se kertoo, ett‰ metodi palauttaa jonkin MVC-toiminnon tuloksen, esimerkiksi n‰kym‰n (View).
+        {                               //Privacy() = metodin nimi. T‰m‰ metodi k‰sittelee yleens‰ /Privacy-sivun.
+            return View();              //palauttaa n‰kym‰n, joka sijaitsee Views/Home/Privacy.cshtml-tiedostossa. T‰m‰ on oletusn‰kym‰, joka luodaan, kun luodaan uusi ASP.NET Core MVC -projekti.
+        }
+
+        [ResponseCache(Duration = 0, //ResponseCache-attribuutti m‰‰ritt‰‰, ett‰ t‰m‰n metodin tuottamaa sis‰ltˆ‰ ei saa v‰limuistittaa. T‰m‰ on t‰rke‰‰ virhesivujen kohdalla, jotta k‰ytt‰j‰t n‰kev‰t aina ajantasaisen virhesivun.
+                       Location = ResponseCacheLocation.None, //Location = ResponseCacheLocation.None tarkoittaa, ett‰ sis‰ltˆ‰ ei saa tallentaa mihink‰‰n v‰limuistiin, kuten selaimen v‰limuistiin tai v‰lityspalvelimen v‰limuistiin.
+                       NoStore = true)]//NoStore = true -> sis‰ltˆ‰ ei saa tallentaa mihink‰‰n v‰limuistiin, eik‰ sit‰ saa k‰ytt‰‰ uudelleen myˆhemmin. T‰m‰ on erityisen t‰rke‰‰ virhesivujen kohdalla, jotta k‰ytt‰j‰t n‰kev‰t aina ajantasaisen virhesivun.
+        public IActionResult Error() //public = metodi on julkinen, eli sit‰ voidaan kutsua luokan ulkopuolelta
+                                     //IActionResult = metodin palautustyyppi. Se kertoo, ett‰ metodi palauttaa jonkin MVC-toiminnon tuloksen, esimerkiksi n‰kym‰n (View).
+        {                               //Error() = metodin nimi. T‰m‰ metodi k‰sittelee yleens‰ virhesivun n‰ytt‰misen.
             return View(new ErrorViewModel
             {
                 RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier

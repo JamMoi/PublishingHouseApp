@@ -1,13 +1,15 @@
 ﻿using Microsoft.AspNetCore.Mvc; //Tarjoaa MVC:n Controller- ja ActionResult-luokat
 using Microsoft.AspNetCore.Mvc.Rendering;//Auttaa luomaan HTML-elementtejä Razorissa (esim. <select> listoja).
 using Microsoft.EntityFrameworkCore;//Tarjoaa Entity Framework Core -toiminnallisuudet tietokantakyselyihin ja -muutoksiin.
-using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.Blazor;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.Blazor; //TARVIIKO TÄTÄ? POISTA
 using PublishingHouseApp.Data;//tietokantayhteys, DbContext-luokka
 using PublishingHouseApp.Models;//Sovelluksen tietomallit, kuten Author ja Book
 using System;//Perus .NET -toiminnallisuudet(Listat, päivämäärät, LINQ, jne.)
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization; //Mahdollistaa roolipohjaisen pääsynhallinnan, jos halutaan rajoittaa tiettyihin toimintoihin vain tietyt käyttäjät (esim. Adminit).
+
 
 namespace PublishingHouseApp.Controllers
 {
@@ -52,7 +54,7 @@ namespace PublishingHouseApp.Controllers
         }
 
         // GET: Authors/Create
-
+        [Authorize(Roles = "Admin")]
         public IActionResult Create() // näyttää tyhjän lomakkeen uuden kirjailijan lisäämiseksi.
         //Kutsuketju: Index.cshtml → Create-linkki → Controller.Create() → Create.cshtml
         {
@@ -64,6 +66,7 @@ namespace PublishingHouseApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create([Bind("AuthorId,Firstname,Surname,Email,PhoneNumber,Bio")] Author author)// KÄSITTELEE TALLENNUKSEN. kun lomake lähetetään, tarkistaa tiedot (ModelState.IsValid) ja lisää uuden kirjailijan tietokantaan. Tallentaa muutokset. Palaa listauskeen.
         //vastaanottaa lomakkeesta Author-olion, Asettaa automaattiseti piävämäärän, Tallentaa Authorin tietokantaan, Ohjaa takaisin indeksiin.
         //Kutsuketju: Create.cshtml(form POST) → Controller.Create(POST) → Save → Redirect(Index) ///[Bind] rajoittaa, mitä kenttiä sallitaan lomakkeelta
@@ -71,15 +74,16 @@ namespace PublishingHouseApp.Controllers
             if (ModelState.IsValid)
             {
                 author.Date = DateTime.Today; //asettaa päivämäärän nykyhetkeen
-                db.Add(author);              //lisää uuden author-olion tietokantakontekstiin
+                db.Authors.Add(author);              //lisää uuden author-olion tietokantakontekstiin
                 await db.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            
+
             return View(author);
         }
 
         // GET: Authors/Edit/5 
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int? id)//hakee muokattavan kirjailijan id:n perusteella
         //Hakee muokattavan Authorin. Lähettää sen Edit.cshtml-sivulle.
         {
@@ -101,6 +105,7 @@ namespace PublishingHouseApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         //TÄMÄ EDIT(POST) METODI KÄSITTELEE EDIT.CSHTML-LOMAKKEEN "SAVE" (VIEW) painikkeen PAINALLUKSEN.
         public async Task<IActionResult> Edit(int id, [Bind("AuthorId,Firstname,Surname,Email,PhoneNumber,Bio,Date")] Author author)//kun muokkaus lähetetään, tarkistaa että URL:n id ja lomakkeen id täsmäävät. Päivittää kirjailijan. tallentaa tietokantaan. käsittelee mahdollisen samanaikaisuusvirheen (DbUpdateConcurrencyException).
         //Tarkistaa URL:ssa olevan ID:n ja lomakkeessa olevan ID:n. ModelStatessa tarkistaa että pakoslliset kentät on näytetty, tietotyypit oikein ja dataannotations säännöt täyttyvät. Päivittää Authorin.Tallentaa tietokantaan.Ohjaa Indexiin.
@@ -120,7 +125,7 @@ namespace PublishingHouseApp.Controllers
                 catch (DbUpdateConcurrencyException) //käsittelee samanaikaisuusvirheen esi. jos toinen käyttäjä on muokannut samaa kirjailijaa
                 {
                     if (!AuthorExists(author.AuthorId)) //tarkistaa onko kirjailija edelleen olemassa
-                    { 
+                    {
                         return NotFound(); //jos ei ole, palauttaa NotFound
                     }
                     else //muussa tapauksessa heittää virheen uudelleen (KEHITYSVAIHEESSA!?)
@@ -134,6 +139,7 @@ namespace PublishingHouseApp.Controllers
         }
 
         // GET: Authors/Delete/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id) //hakee authorin ja  Näyttää poistovahvistusnäkymän.
         {
             if (id == null)
@@ -154,6 +160,7 @@ namespace PublishingHouseApp.Controllers
         // POST: Authors/Delete/5
         [HttpPost, ActionName("Delete")]//// Poistetaan kirjailija, jos hänellä EI ole kirjoja
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
 
         //TÄMÄ DELETE(POST) METODI KÄSITTELEE DELETE.CSHTML-LOMAKKEEN (VIEW) "DELETE" NAPIN PAINALLUKSEN.
 
@@ -184,10 +191,50 @@ namespace PublishingHouseApp.Controllers
 
             return RedirectToAction(nameof(Index));//ohjaa takaisin Indexiin
         }
-       
+
         private bool AuthorExists(int id)//Apumetodi->Tarkistaa onko kirjailija olemassa. Käytetään concurrency-virheen käsittelyssä.
         {
             return db.Authors.Any(e => e.AuthorId == id);
+        }
+ // GET: Authors/Search?query=some+search+term
+        // Hakee kirjailijoita nimen perusteella.
+        // Tämä toiminto on sallittu kaikille käyttäjille.
+        public async Task<IActionResult> Search(string query)
+        {
+            if (string.IsNullOrWhiteSpace(query))
+            {
+                return RedirectToAction(nameof(Index));
+            }
+
+            var results = await db.Authors
+                .Include(a => a.Books)
+                .Where(a =>
+                    a.Firstname.Contains(query) ||
+                    a.Surname.Contains(query) ||
+                    (a.Firstname + " " + a.Surname).Contains(query))
+                .ToListAsync();
+
+            return View("Index", results);
+        }
+        // GET: Authors/LiveSearch?query=...
+        // Tekee dynaamisen haun ja palauttaa vain osittaisen näkymän AJAX-kutsua varten.
+        // Tämä toiminto on sallittu kaikille käyttäjille.
+        public async Task<IActionResult >LiveSearch (string? query)
+        {
+            var authorQuery = db.Authors
+                .Include(a => a.Books)
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(query))
+            {
+                authorQuery = authorQuery.Where(a =>
+                    a.Firstname.Contains(query) ||
+                    a.Surname.Contains(query) ||
+                    (a.Firstname + " " + a.Surname).Contains(query));
+            }
+            var results = await authorQuery.ToListAsync();
+
+            return PartialView("_AuthorsTable", results); //palauttaa vain osan näkymästä, joka päivitetään AJAX-kutsulla
         }
     }
 }

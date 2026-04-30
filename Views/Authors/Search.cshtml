@@ -1,0 +1,21 @@
+﻿@model IEnumerable<PublishingHouseApp.Models.Author>
+
+<h2>Author Search Results</h2>
+
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var author in Model)
+        {
+            <tr>
+                <td>@author.Firstname @author.Surname</td>
+                <td>@author.Email</td>
+            </tr>
+        }
+    </tbody>
+</table>

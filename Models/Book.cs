@@ -32,7 +32,8 @@ public partial class Book //Book-luokka edustaa tietokannan Book-taulua.
 
     public string? Edition { get; set; }
 
-    public string? Genre { get; set; }
+    //public string? Genre { get; set; }
+    public ICollection<BookGenre> BookGenres { get; set; } = new List<BookGenre>();
 
     public string? Language { get; set; }
 

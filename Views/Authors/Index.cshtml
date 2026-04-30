@@ -1,89 +1,58 @@
-﻿@model IEnumerable<PublishingHouseApp.Models.Author> //tämä kertoo Razorille, että näkymä saa malliksi Author-olioiden listan.IEnumerable<Author>//= luettelo kirjailijoista. Tämä luettelo tulee suoraan controllerista-->return View(await db.Authors.ToListAsync());
-@*Taulukko näyttää kaikki kentät ja tekee linkit: Edit -> Authors/Edit/id
-Details -> Authors/Details/id
-Delete -> Authors/Delete/id. JOKAINEN NÄISTÄ LINKEISTÄ OHJAA SEURAAVAAN KONTROLLERIN METODIIN*@
+﻿@model IEnumerable<PublishingHouseApp.Models.Author>
+@* Tämä kertoo Razorille, että näkymä saa malliksi Author-olioiden listan.
+   IEnumerable<Author> = luettelo kirjailijoista.
+   Tämä luettelo tulee suoraan controllerista, esim:
+   return View(await db.Authors.ToListAsync());
+*@
+
 @{
-    ViewData["Title"] = "Authors";@*Html sivun Otsikko*@
+    ViewData["Title"] = "Authors"; @* Html-sivun otsikko *@
 }
 
-<h1>Authors</h1> @*Sivun näkyvä otsikko*@
+<h1>Authors</h1> @* Sivun näkyvä otsikko *@
 
+@* Hakukenttä kirjailijoiden live-hakua varten *@
+<div class="mb-3">
+    <input type="text" id="authorSearch" class="form-control" placeholder="Search authors..." />
+</div>
+
+@* 🔒 Vain admin näkee uuden kirjailijan lisäysnapin *@
+@if (User.IsInRole("Admin"))
+{
     <p>
         <a asp-action="Create" asp-controller="Authors" class="btn btn-success">
             <i class="bi bi-plus-circle"></i> Add New Author
         </a>
     </p>
+}
 
-<p>
-        <a asp-action="Create" class)"btn btn success"> 
-            <i class="bi bi-plus-circle"></i> @*lisätään uusi author.*@
-            </a>
-</p>
-    <table class="table table-striped table-hover">
-    <!--Taulukko kirjailijoista, SARAKKEIDEN OTSIKOT-->
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.First().Firstname)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.First().Surname)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.First().Email)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.First().PhoneNumber)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.First().Bio)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.First().Date)
-            </th>
-             <th>Books</th>
-             <th>Actions</th>
-            </tr>
-    </thead>
-    <tbody>@*tAULUKON RUNGON TÄYTTÄMINEN*@
-            @foreach (var item in Model) @*Author-lista, jonka controller lähetti näkymälle. foreach käy läpi jokaisen kirjailijan (Author-olion) listasta. item = yksi Author-olio kerralla.*@
-            { 
-                <tr>
-                    <td>@item.Firstname</td>
-                    <td>@item.Surname</td>
-                    <td>@item.Email</td>
-                    <td>@item.PhoneNumber</td>
-                    <td>@item.Bio</td>
-                    <td>@item.Date.ToString("dd.MM.yyyy")</td>
-                    <td>
-                        @if (item.Books != null && item.Books.Any())
-                        {
-                            <ul class="mb-0">
-                                @foreach (var book in item.Books)
-                                {
-                                    <li>@book.Title</li>
-                                }
-                            </ul>
-                        }
-                        else
-                        {
-                            <span>No books</span>
-                        }
-                    </td>
-                    <td>
-                        <div class="d-flex flex-wrap gap-2">
-                        <a asp-action="Edit" asp-route-id="@item.AuthorId" class="btn btn-primary btn-sm">
-                            <i class="bi bi-pencil-fill"></i> Edit
-                        </a>
-                        <a asp-action="Details" asp-route-id="@item.AuthorId" class="btn btn-info btn-sm">
-                            <i class="bi bi-eye-fill"></i> Details
-                        </a>
-                        <a asp-action="Delete" asp-route-id="@item.AuthorId" class="btn btn-danger btn-sm">
-                            <i class="bi bi-trash-fill"></i> Delete
-                        </a>
-                        </div>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+@* Tämä div sisältää kirjailijataulukon.
+   Partial View _AuthorsTable renderöidään tänne aluksi koko mallin kanssa.
+*@
+<div id="authorsTableContainer">
+    @await Html.PartialAsync("_AuthorsTable", Model)
+</div>
+
+<script>
+    // Haetaan hakukenttä ja taulukon container JavaScriptiä varten
+    const authorSearchInput = document.getElementById("authorSearch");
+    const authorsTableContainer = document.getElementById("authorsTableContainer");
+
+    let debounceTimer; // viivästää hakua, ettei pyyntö lähde jokaisesta näppäimestä heti
+
+    // Kun käyttäjä kirjoittaa hakukenttään, tehdään AJAX-haku viiveellä
+    authorSearchInput.addEventListener("keyup", function () {
+        clearTimeout(debounceTimer);
+
+        debounceTimer = setTimeout(async () => {
+            const query = authorSearchInput.value;
+
+            // Kutsuu AuthorsControllerin LiveSearch-metodia
+            const response = await fetch(`/Authors/LiveSearch?query=${encodeURIComponent(query)}`);
+
+            // Palautettu HTML sijoitetaan taulukon tilalle
+            const html = await response.text();
+            authorsTableContainer.innerHTML = html;
+        }, 300);
+    });
+</script>
