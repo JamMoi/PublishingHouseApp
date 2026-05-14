@@ -17,7 +17,7 @@
     joka näyttää kirjat visuaalisina kortteina
 *@
         <a asp-controller="Books" asp-action="Browse" class="btn btn-primary btn-lg me-2">Browse Books</a>
-        <a asp-controller="Authors" asp-action="Index" class="btn btn-outline-secondary btn-lg">Meet Authors</a>
+        <a asp-controller="Authors" asp-action="Browse" class="btn btn-outline-secondary btn-lg">Meet Authors</a>
     </div>
 </div>
 
@@ -69,7 +69,7 @@
                                             </p>
 
                                             <p class="mb-2">
-                                                <strong>Published:</strong> @book.PublishedDate.ToString("dd.MM.yyyy")
+                                                <strong>Published:</strong> @book.PublishedDate?.ToString("dd.MM.yyyy")
                                             </p>
 
                                             <p class="mb-4">
