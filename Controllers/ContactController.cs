@@ -19,19 +19,7 @@ namespace PublishingHouseApp.Controllers
 //Jos lomake on validi:Voit käsitellä tiedot: lähettää sähköpostin, tallentaa tietokantaan tms.
 //Tässä tapauksessa vain asetetaan onnistumisviesti TempData["SuccessMessage"] ja uudelleenohjataan samaan lomakkeeseen.
 //Jos lomake ei ole validi: Lomake näytetään uudelleen käyttäjälle, ja virheilmoitukset näkyvät asp-validation-for-tageissa Index.cshtml:ssa.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult Index(ContactFormModel model)
-        {
-            if (ModelState.IsValid)
-            {
-                // Process the form data (e.g., send email, save to database)
-                // For now, just redirect to a thank you page
-                TempData["SuccessMessage"] = "Thank you for contacting us! We will contact you as soon as possibel";
-                return RedirectToAction("Index");
-            }
-            // If the model state is invalid, return to the form with validation messages
-            return View(model);
-        }
+       
+        
     }
 }
