@@ -21,7 +21,8 @@ public partial class Book //Book-luokka edustaa tietokannan Book-taulua.
     [Required] 
     public string Title { get; set; } = null!;
 
-    public DateTime PublishedDate { get; set; }
+    [DataType(DataType.Date)]
+    public DateTime? PublishedDate { get; set; }
     public decimal Price { get; set; }
     [Required] 
     public bool IsAvailable { get; set; }

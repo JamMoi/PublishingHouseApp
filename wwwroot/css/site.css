@@ -1,32 +1,80 @@
+/* =========================
+   PERUSASETUKSET
+========================= */
+
 html {
-  font-size: 14px;
+    font-size: 14px;
+    position: relative;
+    min-height: 100%;
 }
 
 @font-face {
     font-family: 'American Typewriter';
     src: url('/fonts/AmericanTypewriter.woff2') format('woff2');
-    font-weight: normal;
-    font-style: normal;
 }
 
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
-}
-.navbar ul li {
-    margin-right: 20px;
+    html {
+        font-size: 16px;
+    }
 }
 
-.navbar ul li a {
-        text-decoration: none;
-        color: #2a2a2a;
-        font-weight: bold;
-        transition: color 0.3s ease; 
+body {
+    font-family: 'American Typewriter', serif;
+    background-color: #ffffff;
+    color: #111111;
+    margin: 0;
+    padding: 0;
+    margin-bottom: 160px;
 }
-    .navbar ul li a:hover {
-        color: #ff9900 !important;
+
+main {
+    padding-bottom: 160px;
+}
+
+.search-form {
+    max-width: 500px;
+}
+
+
+/* =========================
+   NAVBAR
+========================= */
+
+.navbar {
+    background-color: #111111 !important;
+    padding: 10px 20px;
+    border-bottom: 1px solid #333333;
+}
+
+    .navbar ul li {
+        margin-right: 20px;
     }
+
+    .navbar .nav-link,
+    .navbar a,
+    .navbar-nav .nav-link,
+    .navbar-brand {
+        color: #ffffff !important;
+        font-weight: bold;
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+
+        .navbar .nav-link:hover,
+        .navbar a:hover,
+        .navbar-brand:hover {
+            color: #c9a227 !important;
+        }
+
+.navbar-toggler {
+    border-color: #ffffff !important;
+}
+
+
+/* =========================
+   SISƒLT÷
+========================= */
 
 .container {
     padding: 20px;
@@ -35,94 +83,133 @@ html {
 .welcome-container {
     text-align: center;
     margin-top: 50px;
-    background-color: #fffbdd;
-    border: 2px solid #ffcc00;
-    border-radius: 15px;
+    background-color: #f7f7f7;
+    border: 1px solid #dddddd;
+    border-radius: 12px;
     padding: 30px;
-    box-shadow: 0 0 10px rgba(255, 204, 0, 0.5);
-}
-
-.navbar {
-    background-color: #ffcc00; /* kirkas ja leikkis‰ v‰ri */
-    padding:10px 20px;
-}
-.navbar-brand, .nav-link {
-    color: #333; /* tumma kontrastiv‰ri */
-    font-weight: bold;
-}
-footer {
-    padding:20px 0 !important;
-    height: 10px;!important;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
 }
 
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+/* =========================
+   NAPIT
+========================= */
+
+.btn-primary {
+    background-color: #111111;
+    border-color: #111111;
+    color: #ffffff;
 }
 
-html {
-  position: relative;
-  min-height: 100%;
-}
-
-body {
-    font-family: 'AmericanTypewriter.woff2';
-    background-color: #fff8e7; /* l‰mmin, sarjakuvamainen tausta */
-    color: #333;
-    margin: 0;
-    padding: 0;
-    margin-bottom: 60px;
-}
-
-.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
-  color: var(--bs-secondary-color);
-  text-align: end;
-}
-
-.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
-  text-align: start;
-}
-/* Earthy color theme */
-
-.earth-header {
-    background-color: #8b5e3c; /* warm brown */
-    color: #fff;
-}
-
-.earth-button {
-    background-color: #a97455; /* soft clay tone */
-    border-color: #a97455;
-    transition: 0.2s;
-    color: #fff;
-}
-
-    .earth-button:hover {
-        background-color: #8b5e3c; /* darker earth */
-        border-color: #8b5e3c;
-        color: #fff;
+    .btn-primary:hover {
+        background-color: #c9a227;
+        border-color: #c9a227;
+        color: #111111;
     }
 
-.earth-link {
-    color: #fff !important;
+.btn-info {
+    background-color: #eeeeee;
+    border-color: #dddddd;
+    color: #111111;
 }
+
+    .btn-info:hover {
+        background-color: #c9a227;
+        border-color: #c9a227;
+        color: #111111;
+    }
+
+
+/* =========================
+   KORTIT
+========================= */
+
+.book-card {
+    border: 1px solid #e5e5e5;
+    border-radius: 12px;
+    background-color: #ffffff;
+    overflow: hidden;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+    .book-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.14);
+    }
+
+/* kansikuvat */
+.book-cover-wrapper {
+    height: 260px;
+    margin: 12px;
+    background-color: #f5f5f5;
+    border-radius: 14px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.book-cover {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    border-radius: 10px;
+    display: block;
+}
+
+/* =========================
+   TAULUKOT
+========================= */
+
+.table {
+    background-color: #ffffff;
+}
+
+    .table thead {
+        background-color: #111111;
+        color: #ffffff;
+    }
+
+
+/* =========================
+   FORM
+========================= */
+
+.form-control:focus {
+    border-color: #c9a227;
+    box-shadow: 0 0 0 0.25rem rgba(201, 162, 39, 0.25);
+}
+
+
+/* =========================
+   FOOTER
+========================= */
+
+footer {
+    padding: 20px 0 !important;
+}
+
+
+/* =========================
+   MAP
+========================= */
+
 .map-container {
     width: 100%;
-    height:350px;
-    position: relative;
+    height: 350px;
 }
+
 .map-frame {
     width: 100%;
     height: 100%;
     border: 0;
 }
-body {
-    background-image:
-    background-size: cover; /* Kuva skaalautuu koko taustalle */
-    background-repeat: no-repeat; /* Ei toistoa */
-    background-position: center; /* Keskitet‰‰n kuva */
-    background-attachment: fixed; /* Parallax-efekti: kuva pysyy paikallaan */
-}
-/* Pallojen ulkoasu */
+
+
+/* =========================
+   CAROUSEL
+========================= */
+
 .carousel-indicators-custom button {
     width: 14px;
     height: 14px;
@@ -130,46 +217,31 @@ body {
     background-color: #555;
     border: none;
     margin: 0 5px;
-    transition: background-color 0.3s;
 }
 
     .carousel-indicators-custom button.active {
-        background-color: #007bff; /* Bootstrapin sininen */
+        background-color: #c9a227;
     }
 
-/* Kuvien responsiivisuus */
 .carousel-item img {
     max-height: 400px;
-    width: auto;
     object-fit: contain;
 }
 
-/* Tekstin tausta hieman l‰pin‰kyv‰ksi, jos kuva on tummempi */
 .carousel-item .mt-3 {
-    background-color: rgba(255, 255, 255, 0.85);
-    display: inline-block;
+    background-color: rgba(255, 255, 255, 0.9);
     padding: 10px 15px;
     border-radius: 5px;
 }
 
-/* Nuolet hieman isommaksi ja helpommin klikattavaksi */
 .carousel-control-prev-icon,
 .carousel-control-next-icon {
     width: 35px;
     height: 35px;
 }
-.book-card {
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
-    border: none;
-    border-radius: 12px;
+a.btn {
+    pointer-events: auto !important;
+    cursor: pointer !important;
+    position: relative;
+    z-index: 9999;
 }
-
-    .book-card:hover {
-        transform: translateY(-8px);
-        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.18);
-    }
-
-    .book-card img {
-        border-top-left-radius: 12px;
-        border-top-right-radius: 12px;
-    }

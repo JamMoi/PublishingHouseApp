@@ -53,6 +53,6 @@
     <form asp-action="Delete">@*→ Lähettää POST-kutsun DeleteConfirmed-metodille (nimetty ActionName-attribuutilla).Lähettää poistopyynnön AUthorControllerille*@
         <input type="hidden" asp-for="AuthorId" /> @*Ähettää ID:n näkymättä käyttäjälle. Piilotettu kenttä, joka sisältää AuthorId:n*@
         <input type="submit" value="Delete" class="btn btn-danger" /> |@*Poinike Delete , Suorittaa poistamisen*@
-        <a asp-action="Index">Back to List</a> @*Linkki takaisin Author-listaukseen*@
+        <a asp-action="Index" class="btn btn-secondary">Back to List</a> @*Linkki takaisin Author-listaukseen*@
     </form>
 </div>

@@ -301,7 +301,7 @@ namespace PublishingHouseApp.Migrations
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<DateTime>("PublishedDate")
+                    b.Property<DateTime?>("PublishedDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Title")
@@ -350,92 +350,82 @@ namespace PublishingHouseApp.Migrations
                         new
                         {
                             Id = 1,
-                            Name = "Romaani"
+                            Name = "Fiction"
                         },
                         new
                         {
                             Id = 2,
-                            Name = "Dekkari"
+                            Name = "Fantasy"
                         },
                         new
                         {
                             Id = 3,
-                            Name = "Trilleri"
+                            Name = "Mystery"
                         },
                         new
                         {
                             Id = 4,
-                            Name = "Fantasia"
+                            Name = "Thriller"
                         },
                         new
                         {
                             Id = 5,
-                            Name = "Tieteiskirjallisuus"
+                            Name = "Horror"
                         },
                         new
                         {
                             Id = 6,
-                            Name = "Kauhu"
+                            Name = "Romance"
                         },
                         new
                         {
                             Id = 7,
-                            Name = "Romantiikka"
+                            Name = "Historical Fiction"
                         },
                         new
                         {
                             Id = 8,
-                            Name = "Historiallinen fiktio"
+                            Name = "Children's Literature"
                         },
                         new
                         {
                             Id = 9,
-                            Name = "Nuortenkirja"
+                            Name = "Young Adult"
                         },
                         new
                         {
                             Id = 10,
-                            Name = "Lastenkirja"
+                            Name = "Poetry"
                         },
                         new
                         {
                             Id = 11,
-                            Name = "Elämäkerta"
+                            Name = "Biography"
                         },
                         new
                         {
                             Id = 12,
-                            Name = "Historia"
+                            Name = "Science"
                         },
                         new
                         {
                             Id = 13,
-                            Name = "Tiede"
+                            Name = "Non-fiction"
                         },
                         new
                         {
                             Id = 14,
-                            Name = "Itseapu"
+                            Name = "Comics & Graphic Novels"
                         },
                         new
                         {
                             Id = 15,
-                            Name = "Ruoanlaitto"
+                            Name = "Manga"
                         },
                         new
                         {
                             Id = 16,
-                            Name = "Matkailu"
-                        },
-                        new
-                        {
-                            Id = 17,
-                            Name = "Sarjakuva"
-                        },
-                        new
-                        {
-                            Id = 18,
-                            Name = "Manga"
+                            Name = "Sci-Fi"
                         });
                 });
 

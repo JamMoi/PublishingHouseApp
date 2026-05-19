@@ -1,265 +1,128 @@
-﻿//using System;
-//using System.Collections.Generic;
-//using System.Linq;
-//using System.Threading.Tasks;
-//using Microsoft.AspNetCore.Mvc;
-//using Microsoft.AspNetCore.Mvc.Rendering;
-//using Microsoft.EntityFrameworkCore;
-//using PublishingHouseApp.Data;
-//using PublishingHouseApp.Models;
-
-//namespace PublishingHouseApp.Controllers
-//{
-//    public class BooksController : Controller
-//    {
-//        private readonly PublishingHouseContext db;
-
-//        public BooksController(PublishingHouseContext context)
-//        {
-//            db = context;
-//        }
-
-//        // GET: Books
-//        public async Task<IActionResult> Index()
-//        {
-//            var publishingHouseContext = db.Books.Include(b => b.Author);
-//            return View(await publishingHouseContext.ToListAsync());
-//        }
-
-//        // GET: Books/Details/5
-//        public async Task<IActionResult> Details(int? id)
-//        {
-//            if (id == null)
-//            {
-//                return NotFound();
-//            }
-
-//            var book = await db.Books
-//                .Include(b => b.Author)
-//                .FirstOrDefaultAsync(m => m.BookId == id);
-//            if (book == null)
-//            {
-//                return NotFound();
-//            }
-
-//            return View(book);
-//        }
-
-//        // GET: Books/Create
-//        public IActionResult Create()
-//        {
-//            //ViewData["AuthorId"] = new SelectList(db.Authors, "AuthorId", "Firstname");
-//            ViewData["AuthorId"] = new SelectList(
-//            db.Authors.Select(a => new { a.AuthorId, FullName = a.Firstname + " " + a.Surname }),
-//             "AuthorId", "FullName"
-//             );
-//            return View();
-//        }
-
-//        // POST: Books/Create
-//        // To protect from overposting attacks, enable the specific properties you want to bind to.
-//        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-//        [HttpPost]
-//        [ValidateAntiForgeryToken]
-//        public async Task<IActionResult> Create([Bind("BookId,AuthorId,Isbn,Title,Editor,PublishedDate,Edition,Genre,Language,Keywords,PageCount,Format,FilePath,CoverImageUrl,Price,IsAvailable")] Book book)
-//        {
-//            if (ModelState.IsValid)
-//            {
-//                db.Add(book);
-//                await db.SaveChangesAsync();
-//                return RedirectToAction(nameof(Index));
-//            }
-
-//            // Reload dropdown list if validation fails
-//            ViewData["AuthorId"] = new SelectList(
-//               db.Authors.Select(a => new { a.AuthorId, FullName = a.Firstname + " " + a.Surname }),
-//               "AuthorId",
-//               "FullName",
-//               book.AuthorId
-//            );
-
-//            return View(book);
-
-//}
-
-//        //public async Task<IActionResult> Create([Bind("AuthorId,Isbn,Title,Editor,PublishedDate,Edition,Genre,Language,Keywords,PageCount,Format,FilePath,CoverImageUrl,Price,IsAvailable")] Book book)
-//        //{
-//        //    if (ModelState.IsValid)
-//        //    {
-//        //        db.Add(book);
-//        //        await db.SaveChangesAsync();
-//        //        return RedirectToAction(nameof(Index));
-//        //    }
-//        //    ViewData["AuthorId"] = new SelectList(db.Authors, "AuthorId", "Firstname", book.AuthorId);
-//        //    return View(book);
-//        //}
-
-//        // GET: Books/Edit/5
-//        public async Task<IActionResult> Edit(int? id)
-//        {
-//            if (id == null)
-//            {
-//                return NotFound();
-//            }
-
-//            var book = await db.Books.FindAsync(id);
-//            if (book == null)
-//            {
-//                return NotFound();
-//            }
-//            ViewData["AuthorId"] = new SelectList(db.Authors.Select(a => new { a.AuthorId, FullName = a.Firstname + "" + a.Surname}), "AuthorId", "FullName", book.AuthorId);
-//            return View(book);
-//        }
-
-//        // POST: Books/Edit/5
-//        // To protect from overposting attacks, enable the specific properties you want to bind to.
-//        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-//        [HttpPost]
-//        [ValidateAntiForgeryToken]
-//        public async Task<IActionResult> Edit(int id, [Bind("BookId,AuthorId,Isbn,Title,Editor,PublishedDate,Edition,Genre,Language,Keywords,PageCount,Format,FilePath,CoverImageUrl,Price,IsAvailable")] Book book)
-//        {
-//            if (id != book.BookId)
-//            {
-//                return NotFound();
-//            }
-
-//            if (ModelState.IsValid)
-//            {
-//                try
-//                {
-//                    db.Update(book);
-//                    await db.SaveChangesAsync();
-//                }
-//                catch (DbUpdateConcurrencyException)
-//                {
-//                    if (!BookExists(book.BookId))
-//                    {
-//                        return NotFound();
-//                    }
-//                    else
-//                    {
-//                        throw;
-//                    }
-//                }
-//                return RedirectToAction(nameof(Index));
-//            }
-//            ViewData["AuthorId"] = new SelectList(
-//                db.Authors.Select(a => new { a.AuthorId, FullName = a.Firstname + " " + a.Surname }),
-//               "AuthorId",
-//               "FullName",
-//               book.AuthorId);
-//            return View(book);
-//        }
-
-//        // GET: Books/Delete/5
-//        public async Task<IActionResult> Delete(int? id)
-//        {
-//            if (id == null)
-//            {
-//                return NotFound();
-//            }
-
-//            var book = await db.Books
-//                .Include(b => b.Author)
-//                .FirstOrDefaultAsync(m => m.BookId == id);
-//            if (book == null)
-//            {
-//                return NotFound();
-//            }
-
-//            return View(book);
-//        }
-
-//        // POST: Books/Delete/5
-//        [HttpPost, ActionName("Delete")]
-//        [ValidateAntiForgeryToken]
-//        public async Task<IActionResult> DeleteConfirmed(int id)
-//        {
-//            var book = await db.Books.FindAsync(id);
-//            if (book != null)
-//            {
-//                db.Books.Remove(book);
-//            }
-
-//            await db.SaveChangesAsync();
-//            return RedirectToAction(nameof(Index));
-//        }
-
-//        private bool BookExists(int id)
-//        {
-//            return db.Books.Any(e => e.BookId == id);
-//        }
-//    }
-//}
-
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Hosting;
-using PublishingHouseApp.Data;
-using PublishingHouseApp.Models;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.CodeAnalysis.CSharp.Syntax; // Mahdollistaa roolipohjaisen suojauksen
-using PublishingHouseApp.ViewModels;
+﻿using Microsoft.AspNetCore.Mvc; // MVC Controller- ja IActionResult-luokat
+using Microsoft.AspNetCore.Mvc.Rendering; // SelectList dropdown-listoja varten
+using Microsoft.EntityFrameworkCore; // Entity Framework Core: Include, ThenInclude, ToListAsync jne.
+using PublishingHouseApp.Data; // PublishingHouseContext eli tietokantayhteys
+using PublishingHouseApp.Models; // Book, Author, Genre ja muut mallit
+using Microsoft.AspNetCore.Authorization; // Authorize-attribuutti roolien tarkistamiseen
+using PublishingHouseApp.ViewModels; // BookCreateViewModel ja BookEditViewModel
 
 namespace PublishingHouseApp.Controllers
 {
-
-    public class BooksController : Controller //Tämä luo BooksController-luokan, joka perii ASP.NET Core MVC:n Controller-luokan ominaisuudet.
+    // BooksController käsittelee kirjoihin liittyvät pyynnöt:
+    // listaus, details, create, edit, delete, browse, search ja live search.
+    public class BooksController : Controller
     {
-        private readonly PublishingHouseContext db; // Tietokantayhteys, jonka kautta tehdään kyselyt
-        public BooksController(PublishingHouseContext context) //Konstruktori, joka saa tietokantakontekstin injektoituna, Dependency Injection -periaatteen mukaisesti.
+        // db on tietokantayhteys
+        // Sen kautta haetaan ja tallennetaan kirjoja, kirjailijoita ja genrejä.
+        private readonly PublishingHouseContext db;
+
+        // Konstruktori saa tietokantayhteyden Dependency Injectionin kautta.
+        // ASP.NET Core antaa PublishingHouseContext-olion automaattisesti.
+        public BooksController(PublishingHouseContext context)
         {
             db = context;
         }
 
         // GET: Books
-
-        // Hakee kaikki kirjat tietokannasta. Include(b => b.Author) lataa myös kirjailijat, jotta näkymässä voidaan näyttää esimerkiksi kirjan tekijän nimi.
-        //Palauttaa kaikkien kirjojen Index-näkymän listalla.
-        public async Task<IActionResult> Index()
+        // Tämä action suoritetaan,
+        // kun käyttäjä avaa /Books-sivun.
+        //
+        // Selain lähettää HTTP GET -pyynnön:
+        // /Books
+        //
+        // Controller hakee kirjat tietokannasta
+        // ja lähettää ne Index.cshtml-näkymälle.
+        //
+        // Index.cshtml renderöi _BooksList-partialin.
+        //
+        // _BooksList.cshtml päättää User.IsInRole("Admin")
+        // perusteella:
+        //
+        // - Admin → taulukko/listanäkymä
+        // - Tavallinen käyttäjä → korttinäkymä
+        public async Task<IActionResult> Index(int? pageNumber)
         {
-            //var publishingHouseContext = db.Books.Include(b => b.Author);
-            //return View(await publishingHouseContext.ToListAsync());
-            var publishingHouseContext = db.Books
-            .Include(b => b.Author)
-            .Include(b => b.BookGenres)
-                .ThenInclude(bg => bg.Genre);
+            // Määritetään montako kirjaa näytetään yhdellä sivulla.
+            //
+            // Admin näkee 10 kirjaa per sivu.
+            // Tavallinen käyttäjä näkee 8 kirjaa per sivu.
+            int pageSize = User.IsInRole("Admin") ? 10 : 8;
 
-            return View(await publishingHouseContext.ToListAsync());
+            // Rakennetaan tietokantakysely kirjoihin.
+            //
+            // Include(b => b.Author)
+            // hakee mukaan kirjan kirjailijan.
+            //
+            // Include + ThenInclude
+            // hakee mukaan kirjan genret.
+            //
+            // AsNoTracking()
+            // nopeuttaa hakua,
+            // koska tietoja vain näytetään eikä muokata.
+            var books = db.Books
+                .Include(b => b.Author)
+                .Include(b => b.BookGenres)
+                    .ThenInclude(bg => bg.Genre)
+                .AsNoTracking();
 
+            // PaginatedList.CreateAsync()
+            // hakee tietokannasta vain yhden sivun tiedot,
+            // eikä kaikkia kirjoja kerralla.
+            //
+            // pageNumber ?? 1 tarkoittaa:
+            // jos sivunumeroa ei ole annettu,
+            // käytetään sivua 1.
+            PaginatedList<Book> model = await PaginatedList<Book>.CreateAsync(
+                books,
+                pageNumber ?? 1,
+                pageSize);
+
+            // Lähetetään paginoitu kirjalista
+            // Index.cshtml-näkymälle.
+            //
+            // Index.cshtml renderöi _BooksList-partialin,
+            // joka näyttää eri näkymän käyttäjän roolin perusteella.
+            return View("Index", model);
         }
+        
 
         // GET: Books/Details/5
         // Näyttää yhden kirjan tarkemmat tiedot.
-        public async Task<IActionResult> Details(int? id, string? returnAction)// Näyttää yhden kirjan tarkemmat tiedot.
-                                                                               // id kertoo, mikä kirja haetaan tietokannasta.
-                                                                               // returnAction kertoo, mistä näkymästä käyttäjä tuli
-                                                                               // (esimerkiksi "Browse" tai "Index"), jotta Back-painike voidaan ohjata oikein
+        // id kertoo mikä kirja haetaan.
+        // returnAction kertoo mistä näkymästä käyttäjä tuli.
+        public async Task<IActionResult> Details(int? id, string? returnAction)
         {
-            if (id == null) return NotFound();//Varmistaa että ID on olemassa
+            // Jos id puuttuu URL:sta, palautetaan 404.
+            if (id == null)
+                return NotFound();
 
-            //var book = await db.Books// Haetaan yksi kirja ja sen kirjoittaja
-            //    .Include(b => b.Author)
-            //    .FirstOrDefaultAsync(m => m.BookId == id);
+            // Haetaan kirja id:n perusteella.
+            // Mukaan haetaan kirjailija ja genret.
             var book = await db.Books
-        .Include(b => b.Author)
-        .Include(b => b.BookGenres)
-            .ThenInclude(bg => bg.Genre)
-        .FirstOrDefaultAsync(m => m.BookId == id);
+                .Include(b => b.Author)
+                .Include(b => b.BookGenres)
+                    .ThenInclude(bg => bg.Genre)
+                .FirstOrDefaultAsync(m => m.BookId == id);
 
-            if (book == null) return NotFound();//jos kirjaa ei löydy palauttaa NotFound()
+            // Jos kirjaa ei löydy, palautetaan 404.
+            if (book == null)
+                return NotFound();
+
+            // Lähetetään returnAction näkymälle Back-painiketta varten.
             ViewBag.ReturnAction = returnAction;
-            return View(book); //Palauttaa kirjan tiedot näkymään ( Lähettää yhden Book-olion näkymään)
 
+            // Lähetetään yksi Book-olio Details.cshtml-näkymälle.
+            return View(book);
         }
 
         // GET: Books/Create
-        // Näyttää kirjan luontilomakkeen ja täyttää kirjailija-dropdownin
-        //Vain admin pääsee tähän näkymään
+        // Näyttää uuden kirjan luontilomakkeen.
+        // Vain Admin-rooli pääsee tähän.
         [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
+            // Luodaan kirjailijoista dropdown-lista.
+            // AuthorId on value, FullName näkyy käyttäjälle.
             ViewBag.AuthorId = new SelectList(
                 db.Authors.Select(a => new
                 {
@@ -270,37 +133,33 @@ namespace PublishingHouseApp.Controllers
                 "FullName"
             );
 
+            // Luodaan ViewModel Create-näkymälle.
+            // AvailableGenres sisältää kaikki genret checkboxeja varten.
             var viewModel = new BookCreateViewModel
             {
-                AvailableGenres = db.Genres.OrderBy(g => g.Name).ToList()
+                AvailableGenres = db.Genres
+                    .OrderBy(g => g.Name)
+                    .ToList()
             };
 
+            // Lähetetään tyhjä lomake Create.cshtml-näkymään.
             return View(viewModel);
         }
-        //public IActionResult Create() //Näyttää lomakkeen uuden kirjan lisäämiseksi.Täyttää Author-dropdownin, jossa näkyy "Etunimi Sukunimi" (ViewBag.AuthorId).Tämä dropdown auttaa käyttäjää valitsemaan kirjailijan, johon kirja liitetään.
-        //{
-        //    //Luo dropdown-listaus kirjailijoista, jossa näytetään etunimi ja sukunimi yhdessä
-        //    ViewBag.AuthorId = new SelectList(
-        //        db.Authors.Select(a => new
-        //        {
-        //            a.AuthorId,
-        //            FullName = a.Firstname + " " + a.Surname
-        //        }),
-        //        "AuthorId",
-        //        "FullName"
-        //    );
-        //    return View();
-        //}
 
         // POST: Books/Create
-        // Tallentaa uuden kirjan tietokantaan, vain admin voi lisätä uusia kirjoja. Varmistaa, että lomakkeen tiedot ovat validit. Jos validointi epäonnistuu, Author-dropdown rakennetaan uudelleen. Redirecttaa onnistuneen lisäyksen jälkeen Index-näkymään.
+        // Tämä suoritetaan, kun admin painaa Create-lomakkeen tallennuspainiketta.
+        // Lomake lähettää BookCreateViewModelin controllerille.
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create(BookCreateViewModel viewModel)
         {
+            // Tarkistetaan lomakkeen validointi.
+            // Jos jokin pakollinen kenttä puuttuu, palataan lomakkeeseen.
             if (!ModelState.IsValid)
             {
+                // Dropdown pitää rakentaa uudelleen,
+                // koska ViewBag ei säily automaattisesti POST-pyynnön jälkeen.
                 ViewBag.AuthorId = new SelectList(
                     db.Authors.Select(a => new
                     {
@@ -312,10 +171,17 @@ namespace PublishingHouseApp.Controllers
                     viewModel.Book.AuthorId
                 );
 
-                viewModel.AvailableGenres = db.Genres.ToList();
+                // Genrelista rakennetaan uudelleen checkboxeja varten.
+                viewModel.AvailableGenres = db.Genres
+                    .OrderBy(g => g.Name)
+                    .ToList();
+
+                // Palautetaan lomake käyttäjälle korjattavaksi.
                 return View(viewModel);
             }
 
+            // Käydään läpi käyttäjän valitsemat genret.
+            // Jokaisesta valitusta genrestä luodaan BookGenre-liitos.
             foreach (var genreId in viewModel.SelectedGenreIds)
             {
                 viewModel.Book.BookGenres.Add(new BookGenre
@@ -324,176 +190,116 @@ namespace PublishingHouseApp.Controllers
                 });
             }
 
+            // Lisätään uusi kirja tietokantakontekstiin.
             db.Books.Add(viewModel.Book);
+
+            // Tallennetaan uusi kirja ja genreliitokset tietokantaan.
             await db.SaveChangesAsync();
 
+            // Tallennuksen jälkeen palataan Books-listaan.
             return RedirectToAction(nameof(Index));
         }
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //[Authorize(Roles = "Admin")]
-        //public async Task<IActionResult> Create([Bind("AuthorId,Isbn,Title,Editor,PublishedDate,Edition,Genre,Language,Keywords,PageCount,Format,FilePath,CoverImageUrl,Price,IsAvailable")] Book book)
-        ////Tallentaa uuden kirjan tietokantaan, jos lomakkeen tiedot ovat validit.Jos validointi epäonnistuu, Author-dropdown rakennetaan uudelleen.Redirecttaa onnistuneen lisäyksen jälkeen Index-näkymään.
-        //{
-        //    // Tämä blokki tulostaa mahdolliset virheet konsoliin debuggausta varten
-        //    if (!ModelState.IsValid)
-        //    {
-        //        var allErrors = ModelState
-        //            .Where(ms => ms.Value.Errors.Any())
-        //            .Select(ms => new
-        //            {
-        //                Field = ms.Key,
-        //                Errors = ms.Value.Errors.Select(e => e.ErrorMessage).ToArray()
-        //            }).ToList();
 
-        //        foreach (var error in allErrors)
-        //        {
-        //            Console.WriteLine($"Field: {error.Field}, Errors: {string.Join(", ", error.Errors)}");
-        //        }
-        //    }
-        //    // Jos lomake on validi, tallennetaan kirja ja ohjaa takaisin listaan
-        //    if (ModelState.IsValid)
-        //    {
-        //        db.Add(book);
-        //        await db.SaveChangesAsync();
-        //        return RedirectToAction(nameof(Index));
-        //    }
-        //    // Jos validointi epäonnistuu, luodaan Author-dropdown uudestaan
-        //    ViewData["AuthorId"] = new SelectList( //lataa Author-dropdown uudelleen, jos validointi epäonnistuu
-        //        db.Authors.Select(a => new { a.AuthorId, FullName = a.Firstname + " " + a.Surname }),
-        //        "AuthorId",
-        //        "FullName",
-        //        book.AuthorId);
-
-        //    return View(book);
-        //}
-
-        // GET: Books/Edit/5 //käyttäjä avaa selaimessa kirjan muokkausnäkymän
-        //näyttää kirjan muokkausnäkymän
+        // GET: Books/Edit/5
+        // Näyttää kirjan muokkauslomakkeen.
+        // Vain Admin saa muokata kirjoja.
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Edit(int? id)//HTTP GET- metodi, joka ajetaan kun käyttäjä menee osoitteeseen /Books/Edit/5,  hakee kirjan ja näyttää muokkauslomakkeen.POST tallentaa muutokset tietokantaan.
-                                                      // lähettää tiedot Viewille //Käyttää try/catch DbUpdateConcurrencyExceptionin käsittelyyn, jos kirja poistettiin samaan aikaan, kun sitä muokattiin.
+        public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null) 
-                return NotFound(); //estää virheellisen URL käytön, Jos käyttäjä menee /Books/Edit ilman id:tä, palauttaa NotFound()-vastauksen.
+            // Jos id puuttuu, palautetaan 404.
+            if (id == null)
+                return NotFound();
 
-            var book = await db.Books //hakee tietokannasta kirjan, jonka BookId vastaa annettua idt
-
-                .Include(b => b.BookGenres) //Include (b =>b.BooKgenres lataa samalla kirjan Genreliitokset, jptta voidaan näyttää valmiiksi valitut genret checkboxesissa
+            // Haetaan muokattava kirja ja sen nykyiset genreliitokset.
+            var book = await db.Books
+                .Include(b => b.BookGenres)
                 .FirstOrDefaultAsync(b => b.BookId == id);
 
-            // Jos kirjaa ei löydy tietokannasta, palautetaan 404
+            // Jos kirjaa ei löydy, palautetaan 404.
             if (book == null)
                 return NotFound();
-            // Luodaan Author-dropdownia varten lista kirjailijoista.
-            // Jokaisesta kirjailijasta muodostetaan FullName = "Firstname + Surname".
-            // Viimeinen parametri (book.AuthorId) määrittää valmiiksi valitun kirjailijan.
 
+            // Luodaan kirjailija-dropdown muokkauslomakkeelle.
             ViewData["AuthorId"] = new SelectList(
                 db.Authors.Select(a => new
                 {
                     a.AuthorId,
-                    FullName = a.Firstname + "" + a.Surname
+                    FullName = a.Firstname + " " + a.Surname
                 }),
-                "AuthorId", // value kenttä dropdownissa
-                "FullName", // käyttäjälle näkyvä teksti
-                book.AuthorId // valmiiksi valittu kirjailija
+                "AuthorId",
+                "FullName",
+                book.AuthorId
+            );
 
-                );
-            // Luodaan näkymälle ViewModel, joka sisältää:
-            // - itse kirjan tiedot
-            // - kaikki mahdolliset genret aakkosjärjestyksessä
-            // - listan niistä genreistä, jotka kirjalla jo on
+            // Luodaan ViewModel Edit-näkymälle.
             var viewModel = new BookEditViewModel
             {
-                Book = book,         // Lähetetään kirjan tiedot näkymälle
+                // Muokattavan kirjan tiedot.
+                Book = book,
 
-                // Haetaan kaikki genret aakkosjärjestyksessä dropdownia varten
-
+                // Kaikki mahdolliset genret.
                 AvailableGenres = db.Genres
-                .OrderBy(g => g.Name)
-                .ToList(),
+                    .OrderBy(g => g.Name)
+                    .ToList(),
 
-                // Poimitaan kirjan nykyiset genre-ID:t listaan.
-                // Näiden avulla checkboxit voidaan näyttää valmiiksi valittuina.
+                // Kirjan nykyiset genre-ID:t,
+                // jotta checkboxit voidaan näyttää valmiiksi valittuina.
                 SelectedGenreIds = book.BookGenres
-            .Select(bg => bg.GenreId)
-            .ToList()
+                    .Select(bg => bg.GenreId)
+                    .ToList()
             };
-            // Lähetetään valmis ViewModel Edit-näkymälle.
+
+            // Lähetetään ViewModel Edit.cshtml-näkymälle.
             return View(viewModel);
         }
 
-
-        //    var book = await db.Books.FindAsync(id);//EF Core tekee SQL-kyselyn:Hakee muokattavan kirjan
-        //    if (book == null) return NotFound();//varmistaa että kirja löytyy
-
-        //    //SelectListin luonti kirjailijoista dropdownia varten
-        //    ViewData["AuthorId"] = new SelectList(//EF Core hakee kaikki kirjailijat tietokannasta ja luo SelectListin, jota käytetään dropdownin täyttämiseen näkymässä.
-        //        db.Authors.Select(a => new
-        //        {
-        //            a.AuthorId,
-        //            FullName = a.Firstname + " " + a.Surname
-        //        }),
-        //        "AuthorId",
-        //        "FullName",
-        //        book.AuthorId
-        //    );
-
-        //    return View(book);
-        //}
-
         // POST: Books/Edit/5
-        // Tallentaa muokatun kirjan tiedot tietokantaan.
-        // Vain Admin-roolin käyttäjät saavat muokata kirjoja.
+        // Tämä suoritetaan, kun admin painaa Edit-lomakkeen Save-painiketta.
+        // Vastaanottaa URL:n id:n ja lomakkeen ViewModelin.
         [HttpPost]
-        [ValidateAntiForgeryToken] // Suojaa lomaketta CSRF-hyökkäyksiltä
+        [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int id, BookEditViewModel viewModel)
         {
-            // Varmistetaan, että URL:ssa tullut id vastaa lomakkeelta tullutta BookId:tä.
-            // Jos ne eivät täsmää, käyttäjä yrittää muokata väärää kirjaa.
+            // Tarkistetaan että URL:n id ja lomakkeen BookId vastaavat toisiaan.
             if (id != viewModel.Book.BookId)
                 return NotFound();
 
-            // Tarkistetaan, että lomakkeen tiedot ovat validit.
-            // Jos esim. jokin pakollinen kenttä puuttuu, mennään takaisin lomakkeeseen.
+            // Jos lomakkeessa on virheitä, palautetaan sama näkymä.
             if (!ModelState.IsValid)
             {
-                // Rakennetaan kirjailija-dropdown uudelleen,
-                // koska muuten se katoaisi näkymästä virhetilanteessa.
+                // Dropdown rakennetaan uudelleen virhetilannetta varten.
                 ViewData["AuthorId"] = new SelectList(
                     db.Authors.Select(a => new
                     {
                         a.AuthorId,
                         FullName = a.Firstname + " " + a.Surname
                     }),
-                    "AuthorId",               // dropdownin value
-                    "FullName",               // dropdownissa näkyvä teksti
-                    viewModel.Book.AuthorId   // valmiiksi valittu kirjailija
+                    "AuthorId",
+                    "FullName",
+                    viewModel.Book.AuthorId
                 );
 
-                // Haetaan genrelista uudelleen aakkosjärjestyksessä,
-                // jotta checkboxit näkyvät uudelleen virhetilanteessa.
+                // Genrelista rakennetaan uudelleen.
                 viewModel.AvailableGenres = db.Genres
                     .OrderBy(g => g.Name)
                     .ToList();
 
-                // Palautetaan sama näkymä käyttäjälle korjattavaksi.
+                // Palautetaan lomake korjattavaksi.
                 return View(viewModel);
             }
 
-            // Haetaan tietokannasta oikea kirja, jota ollaan muokkaamassa.
-            // Include(BookGenres) tarvitaan, jotta vanhat genreliitokset voidaan poistaa ja lisätä uudelleen.
+            // Haetaan tietokannasta oikea kirja,
+            // jota päivitetään lomakkeen tiedoilla.
             var bookFromDb = await db.Books
                 .Include(b => b.BookGenres)
                 .FirstOrDefaultAsync(b => b.BookId == id);
 
-            // Jos kirjaa ei enää löydy tietokannasta, palautetaan 404.
+            // Jos kirjaa ei enää löydy, palautetaan 404.
             if (bookFromDb == null)
                 return NotFound();
 
-            // Päivitetään kirjan tavalliset tiedot lomakkeelta tulleilla arvoilla.
+            // Päivitetään kirjan perustiedot lomakkeen arvoilla.
             bookFromDb.AuthorId = viewModel.Book.AuthorId;
             bookFromDb.Isbn = viewModel.Book.Isbn;
             bookFromDb.Title = viewModel.Book.Title;
@@ -509,14 +315,12 @@ namespace PublishingHouseApp.Controllers
             bookFromDb.Price = viewModel.Book.Price;
             bookFromDb.IsAvailable = viewModel.Book.IsAvailable;
 
-            // Poistetaan kaikki kirjan vanhat genreliitokset.
-            // Näin voidaan rakentaa uusi lista käyttäjän valintojen perusteella.
+            // Poistetaan vanhat genreliitokset.
             bookFromDb.BookGenres.Clear();
 
-            // Käydään läpi kaikki käyttäjän valitsemat genre-ID:t.
+            // Lisätään uudet genreliitokset käyttäjän valintojen mukaan.
             foreach (var genreId in viewModel.SelectedGenreIds)
             {
-                // Lisätään jokaisesta valitusta genrestä uusi BookGenre-liitos.
                 bookFromDb.BookGenres.Add(new BookGenre
                 {
                     BookId = bookFromDb.BookId,
@@ -527,82 +331,172 @@ namespace PublishingHouseApp.Controllers
             // Tallennetaan kaikki muutokset tietokantaan.
             await db.SaveChangesAsync();
 
-            // Kun tallennus onnistuu, siirrytään takaisin kirjojen listaan.
+            // Palataan Books-listaan.
             return RedirectToAction(nameof(Index));
         }
+
         // GET: Books/Delete/5
-        //Näyttää kirjan poiston vahvistusnäkymän
+        // Näyttää poiston vahvistussivun.
+        // Vain Admin voi poistaa kirjoja.
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Delete(int? id)//GET näyttää vahvistusnäkymän kirjan poistolle.
-                                                        //POST poistaa kirjan tietokannasta ja redirecttaa Index-näkymään.
+        public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null) return NotFound();
+            // Jos id puuttuu, palautetaan 404.
+            if (id == null)
+                return NotFound();
 
+            // Haetaan poistettava kirja,
+            // sekä siihen liittyvä kirjailija ja genret.
             var book = await db.Books
-        .Include(b => b.Author)
-        .Include(b => b.BookGenres)
-            .ThenInclude(bg => bg.Genre)
-        .FirstOrDefaultAsync(m => m.BookId == id);
-            if (book == null) return NotFound();
+                .Include(b => b.Author)
+                .Include(b => b.BookGenres)
+                    .ThenInclude(bg => bg.Genre)
+                .FirstOrDefaultAsync(m => m.BookId == id);
 
+            // Jos kirjaa ei löydy, palautetaan 404.
+            if (book == null)
+                return NotFound();
+
+            // Lähetetään kirja Delete.cshtml-vahvistusnäkymälle.
             return View(book);
         }
 
         // POST: Books/Delete/5
+        // Tämä suoritetaan, kun admin vahvistaa poiston Delete-näkymässä.
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> DeleteConfirmed(int id) //Poistaa kirjan tietokannasta
+        public async Task<IActionResult> DeleteConfirmed(int id)
         {
+            // Haetaan poistettava kirja id:n perusteella.
             var book = await db.Books.FindAsync(id);
+
+            // Jos kirja löytyy, poistetaan se.
             if (book != null)
             {
                 db.Books.Remove(book);
             }
 
+            // Tallennetaan poisto tietokantaan.
             await db.SaveChangesAsync();
+
+            // Palataan Books-listaan.
             return RedirectToAction(nameof(Index));
         }
 
-        // Tarkistaa tietokannasta, onko kirja olemassa. Käyttää muokkaus- ja poisto-operaatioiden concurrency-tarkistukseen.
+        // Apumetodi, joka tarkistaa onko kirja olemassa.
+        // Tätä voidaan käyttää esimerkiksi virhetilanteiden tarkistamiseen.
         private bool BookExists(int id)
         {
             return db.Books.Any(e => e.BookId == id);
         }
 
-        //GET: Books/Browse
-        //Näyttää kaikille käyttäjille kirjanäkymän kortteina
+        // GET: Books/Browse
+        // Tämä suoritetaan, kun käyttäjä painaa etusivulla Browse Books -painiketta.
+        // Näyttää kirjat käyttäjäpuolen korttinäkymänä.
         public async Task<IActionResult> Browse()
         {
-            //Haetaan kaikki tietokannan kirjat
-            // Include(b => b.Author) lataa mukaan kirjailijan tiedot
-            //Include + theninclude lataa mukaan kirjan genret
+            // Haetaan kaikki kirjat.
+            // Mukaan haetaan kirjailija ja genret.
+            // AsNoTracking nopeuttaa hakua, koska tietoja vain näytetään.
             var books = await db.Books
                 .Include(b => b.Author)
                 .Include(b => b.BookGenres)
-                .ThenInclude(bg => bg.Genre)
+                    .ThenInclude(bg => bg.Genre)
+                .AsNoTracking()
                 .OrderBy(b => b.Title)
                 .ToListAsync();
 
-            // lähettää kirjalistan Browse-näkymään
+            // Lähetetään kirjalista Browse.cshtml-korttinäkymälle.
             return View(books);
         }
 
-        
-        //GET: Book/Search?query=some+search+term
-        public async Task<IActionResult> Search(string query) //Hakee kirjoja, joiden otsikko tai ISBN sisältää hakutermin
+        // GET: Books/Search?query=hakusana&pageNumber=1
+        // Tämä suoritetaan, kun käyttäjä hakee kirjoja hakukentällä.
+        public async Task<IActionResult> Search(string query, int? pageNumber)
         {
+            // Jos hakusana on tyhjä, palataan Books-listaan.
             if (string.IsNullOrWhiteSpace(query))
             {
-                return RedirectToAction(nameof(Index)); //Jos hakutermi on tyhjä, ohjaa takaisin listaan
+                return RedirectToAction(nameof(Index));
             }
-            var results = await db.Books
-        .Include(b => b.Author)
-        .Include(b => b.BookGenres)
-            .ThenInclude(bg => bg.Genre)
-        .Where(b => b.Title.Contains(query) || b.Isbn.Contains(query))
-        .ToListAsync();
-            return View("Index", results); //Näytä hakutulokset Index-näkymässä
+
+            // Adminille 10 tulosta sivulle, tavalliselle käyttäjälle 8.
+            int pageSize = User.IsInRole("Admin") ? 10 : 8;
+
+            // Rakennetaan hakukysely.
+            // Haetaan mukaan kirjailija ja genret.
+            // Haku kohdistuu kirjan nimeen ja ISBN-numeroon.
+            var books = db.Books
+                .Include(b => b.Author)
+                .Include(b => b.BookGenres)
+                    .ThenInclude(bg => bg.Genre)
+                .Where(b =>
+                    EF.Functions.Like(b.Title, $"%{query}%") ||
+                    EF.Functions.Like(b.Isbn, $"{query}%"))
+                .AsNoTracking();
+
+            // Tallennetaan hakusana näkymää varten.
+            ViewData["CurrentFilter"] = query;
+
+            // Lähetetään hakutulokset takaisin Index.cshtml-näkymälle.
+            //
+            // Index.cshtml EI itse renderöi kirjojen HTML:ää,
+            // vaan kutsuu _BooksList-partial viewtä:
+            //
+            // @await Html.PartialAsync("_BooksList", Model)
+            //
+            // Partial View tarkoittaa näkymän osaa,
+            // joka voidaan renderöidä erikseen
+            //
+            // _BooksList.cshtml sisältää logiikan,
+            // joka tarkistaa käyttäjän roolin:
+            //
+            // if (User.IsInRole("Admin"))
+            //
+            // ja näyttää:
+            //
+            // - Adminille taulukko/listanäkymän
+            // - Tavalliselle käyttäjälle korttinäkymän
+            //
+            // Controller siis vain hakee datan,
+            // mutta Partial View päättää miltä käyttöliittymä näyttää.
+            return View("Index", await PaginatedList<Book>.CreateAsync(
+                books,
+                pageNumber ?? 1,
+                pageSize));
+        }
+
+        // GET: Books/LiveSearch?query=...
+        // Tämä suoritetaan, kun JavaScript hakee kirjoja ilman koko sivun lataamista.
+        public async Task<IActionResult> LiveSearch(string? query)
+        {
+            // Rakennetaan kysely kirjoihin.
+            // Mukaan haetaan kirjailijat ja genret.
+            var booksQuery = db.Books
+                .Include(b => b.Author)
+                .Include(b => b.BookGenres)
+                    .ThenInclude(bg => bg.Genre)
+                .AsQueryable();
+
+            // Jos hakusana ei ole tyhjä,
+            // lisätään hakuehto kirjan nimeen ja ISBN-numeroon.
+            if (!string.IsNullOrWhiteSpace(query))
+            {
+                booksQuery = booksQuery.Where(b =>
+                    EF.Functions.Like(b.Title, $"%{query}%") ||
+                    EF.Functions.Like(b.Isbn, $"%{query}%"));
+            }
+
+            // Suoritetaan kysely ja muutetaan tulokset listaksi.
+            var results = await booksQuery
+                .AsNoTracking()
+                .ToListAsync();
+
+            // Palautetaan vain osittainen näkymä,
+            // ei koko sivua.
+            // JavaScript päivittää tämän avulla kirjalistan.
+            return PartialView("_BooksList", results);
         }
     }
 }

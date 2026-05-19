@@ -44,25 +44,22 @@ namespace PublishingHouseApp.Data
                 .HasForeignKey(bg => bg.GenreId); // Foreign key on GenreId
 
             builder.Entity<Genre>().HasData(
-    new Genre { Id = 1, Name = "Romaani" },
-    new Genre { Id = 2, Name = "Dekkari" },
-    new Genre { Id = 3, Name = "Trilleri" },
-    new Genre { Id = 4, Name = "Fantasia" },
-    new Genre { Id = 5, Name = "Tieteiskirjallisuus" },
-    new Genre { Id = 6, Name = "Kauhu" },
-    new Genre { Id = 7, Name = "Romantiikka" },
-    new Genre { Id = 8, Name = "Historiallinen fiktio" },
-    new Genre { Id = 9, Name = "Nuortenkirja" },
-    new Genre { Id = 10, Name = "Lastenkirja" },
-    new Genre { Id = 11, Name = "Elämäkerta" },
-    new Genre { Id = 12, Name = "Historia" },
-    new Genre { Id = 13, Name = "Tiede" },
-    new Genre { Id = 14, Name = "Itseapu" },
-    new Genre { Id = 15, Name = "Ruoanlaitto" },
-    new Genre { Id = 16, Name = "Matkailu" },
-    new Genre { Id = 17, Name = "Sarjakuva" },
-    new Genre { Id = 18, Name = "Manga" },
-    new Genre { Id = 19, Name = "Sci-Fi" }
+    new Genre { Id = 1, Name = "Fiction" },
+    new Genre { Id = 2, Name = "Fantasy" },
+    new Genre { Id = 3, Name = "Mystery" },
+    new Genre { Id = 4, Name = "Thriller" },
+    new Genre { Id = 5, Name = "Horror" },
+    new Genre { Id = 6, Name = "Romance" },
+    new Genre { Id = 7, Name = "Historical Fiction" },
+    new Genre { Id = 8, Name = "Children's Literature" },
+    new Genre { Id = 9, Name = "Young Adult" },
+    new Genre { Id = 10, Name = "Poetry" },
+    new Genre { Id = 11, Name = "Biography" },
+    new Genre { Id = 12, Name = "Science" },
+    new Genre { Id = 13, Name = "Non-fiction" },
+    new Genre { Id = 14, Name = "Comics & Graphic Novels" },
+    new Genre { Id = 15, Name = "Manga" },
+    new Genre { Id = 16, Name = "Sci-Fi" }
 );
         }
 

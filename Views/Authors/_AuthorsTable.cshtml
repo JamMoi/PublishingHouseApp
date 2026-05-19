@@ -82,11 +82,7 @@ else
                                      @item.Firstname @item.Surname
                     </h5>
 
-                    <p class="card-text">
-                        <strong>Email:</strong> @item.Email
-                        </p>
-
-                  <p class="card-text">
+                       <p class="card-text">
                         <strong>Bio:</strong>
                         @(string.IsNullOrEmpty(item.Bio)
                         ? "No Bio available"
@@ -107,8 +103,11 @@ else
                          }
                        </p>
 
-                       <a asp-action="Details" asp-route-id="@item.AuthorId" class="btn-info btn-sm">Details
-                       </a>
+<a asp-action="Details"
+   asp-route-id="@item.AuthorId"
+   class="btn btn-secondary btn-sm">
+    Details
+</a>  
                     </div>
                    </div>
                  </div>

@@ -68,7 +68,7 @@ else
                         @* Julkaisupäivä, jos haluat näyttää sen käyttäjälle *@
                         <p class="card-text mb-3">
                             <strong>Published:</strong>
-                            @item.PublishedDate.ToShortDateString()
+                            @item.PublishedDate?.ToShortDateString()
                         </p>
 
                         @*

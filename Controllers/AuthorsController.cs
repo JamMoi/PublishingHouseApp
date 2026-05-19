@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc; //Tarjoaa MVC:n Controller- ja ActionResult-luokat
 using Microsoft.AspNetCore.Mvc.Rendering;//Auttaa luomaan HTML-elementtejä Razorissa (esim. <select> listoja).
 using Microsoft.EntityFrameworkCore;//Tarjoaa Entity Framework Core -toiminnallisuudet tietokantakyselyihin ja -muutoksiin.
-using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.Blazor; //TARVIIKO TÄTÄ? POISTA
 using PublishingHouseApp.Data;//tietokantayhteys, DbContext-luokka
 using PublishingHouseApp.Models;//Sovelluksen tietomallit, kuten Author ja Book
 using System;//Perus .NET -toiminnallisuudet(Listat, päivämäärät, LINQ, jne.)
@@ -25,12 +24,25 @@ namespace PublishingHouseApp.Controllers
 
         // GET: Authors
 
-        public async Task<IActionResult> Index() //// Index()-metodi hakee kaikki kirjailijat tietokannasta ja Palauttaa listan Index.cshtml-Viewille. 
-        {
-            var authors = await db.Authors.Include(a => a.Books).ToListAsync(); //ladataan myös kirjailijoiden kirjat
-            return View(authors);                                               //Hakee kaikki Author-tietueet tietokannasta. Lähettää ne Index.cshtml-viewille. View ottaa vastaan IEnumerable<Author> ja näyttää taulukon.
-                                                                                //kutsujetku: Browser → / Authors → Controller.Index() → Index.cshtml
+        public async Task<IActionResult> Index(int? pageNumber) { 
+        
+            // Määritellään montako itemiä näytetään per sivu
+            // Adminille enemmän, käyttäjälle vähemmän
+            int pageSize = User.IsInRole("Admin") ? 10 : 8;
 
+            // Rakennetaan tietokantakysely (ei vielä suoriteta!)
+            // Include = ladataan myös kirjailijan kirjat mukaan
+            // AsNoTracking = nopeampi, koska dataa ei muokata
+            var authors = db.Authors
+                .Include(a => a.Books)
+                .AsNoTracking();
+
+            // Luodaan paginoitu lista:
+            // pageNumber ?? 1 → jos pageNumber on null, käytetään sivua 1
+            return View(await PaginatedList<Author>.CreateAsync(
+                authors,
+                pageNumber ?? 1,
+                pageSize));
         }
 
         // GET: Authors/Details/5
@@ -176,7 +188,7 @@ namespace PublishingHouseApp.Controllers
             }
 
             //tarkastetaan , onko kirjailijalla kirjoja, Jos kirjailijalla on kirjoja, estetään poisto
-            if (author.Books.Any())
+            if (author.Books != null && author.Books.Any())
             {
                 //Lisätään virheilmoitus ModelStateen
                 ModelState.AddModelError("", "Author has books saved, you cannot remove this author");
@@ -196,44 +208,136 @@ namespace PublishingHouseApp.Controllers
         {
             return db.Authors.Any(e => e.AuthorId == id);
         }
- // GET: Authors/Search?query=some+search+term
+
+        // GET: Authors/Browse
+        // Tämä action suoritetaan, kun käyttäjä painaa
+        // Home/Index.cshtml-sivulla "Meet Authors" -painiketta
+        // Painike:
+        //
+        // <a asp-controller="Authors" asp-action="Browse">
+        //
+        // lähettää selaimesta HTTP GET -pyynnön osoitteeseen:
+        // /Authors/Browse
+        //
+        // Tämä action hakee kaikki kirjailijat tietokannasta,
+        // hakee samalla mukaan kirjailijoihin liittyvät kirjat,
+        // järjestää kirjailijat sukunimen mukaan aakkosjärjestykseen
+        // ja lähettää listan Browse.cshtml-näkymälle.
+        //
+        // AsNoTracking() tekee hausta kevyemmän,
+        // koska tietoja vain näytetään eikä muokata
+        public async Task<IActionResult> Browse()
+        {
+            var authors = await db.Authors
+                .Include(a => a.Books) // ladataan mukaan kirjailijan kirjat
+                .AsNoTracking() // nopeampi haku vain näyttämistä varten
+                .OrderBy(a => a.Surname) //järjestetään sukunimen mukaan aakkosjärjestykseen
+                .ToListAsync(); // suorittaa tietokantakyselyn
+
+            return View(authors);   // Lähettää authors-listan Browse.cshtml-näkymälle
+
+        }
+
+        // GET: Authors/Search?query=some+search+term
         // Hakee kirjailijoita nimen perusteella.
         // Tämä toiminto on sallittu kaikille käyttäjille.
+        // Hakukenttä lähettää query-parametrin URL:iin:
+        // /Authors/Search?query=tolkien
+        //
+        // EF.Functions.Like toimii SQL LIKE -hakuna tietokannassa.
+        //
+        // Lopuksi hakutulokset lähetetään takaisin
+        // samaan Index.cshtml-näkymään.
         public async Task<IActionResult> Search(string query)
-        {
-            if (string.IsNullOrWhiteSpace(query))
+{
+    if (string.IsNullOrWhiteSpace(query))  // Tarkistetaan onko hakukenttä tyhjä, null
+                                           // tai sisältää vain välilyöntejä.
             {
-                return RedirectToAction(nameof(Index));
-            }
-
+                return RedirectToAction(nameof(Index)); 
+    }
+            // Rakennetaan tietokantakysely,
+            // joka hakee kirjailijoita nimen perusteella
             var results = await db.Authors
-                .Include(a => a.Books)
-                .Where(a =>
-                    a.Firstname.Contains(query) ||
-                    a.Surname.Contains(query) ||
-                    (a.Firstname + " " + a.Surname).Contains(query))
-                .ToListAsync();
+        // Include lataa mukaan myös kirjailijan kirjat,
+        // jotta niitä voidaan näyttää näkymässä.
+        .Include(a => a.Books)
 
+        .Where(a =>  // Where määrittää hakuehdot
+                     // EF.Functions.Like tekee SQL LIKE -haun tietokannassa.
+                     // % tarkoittaa "sisältää".
+                     //
+                     
+            EF.Functions.Like(a.Firstname, $"%{query}%") ||
+            // Hakee sukunimestä
+            EF.Functions.Like(a.Surname, $"%{query}%") ||
+            // Hakee koko nimestä
+            // esim. "J.R.R Tolkien"
+            EF.Functions.Like(a.Firstname + " " + a.Surname, $"%{query}%")
+        )
+        // AsNoTracking tekee hausta kevyemmän,
+        // koska tietoja vain näytetään eikä muokata.
+        .AsNoTracking()
+        // Suorittaa tietokantakyselyn
+        // ja muuttaa tulokset listaksi.
+        .ToListAsync();
+
+            // Lähettää hakutulokset takaisin Index.cshtml-näkymälle.
+            //
+            // Näkymä saa results-listan modelina
+            // ja näyttää vain hakua vastaavat kirjailijat
             return View("Index", results);
-        }
+}
+
         // GET: Authors/LiveSearch?query=...
         // Tekee dynaamisen haun ja palauttaa vain osittaisen näkymän AJAX-kutsua varten.
         // Tämä toiminto on sallittu kaikille käyttäjille.
+        // JavaScript lähettää AJAX-pyynnön ilman sivun uudelleenlatausta.
+        //
+        // PartialView palauttaa vain taulukon HTML-osan,
+        // ei koko sivua.
+        // query-parametri vastaanottaa käyttäjän kirjoittaman hakusanan.
         public async Task<IActionResult >LiveSearch (string? query)
         {
+            // Rakennetaan tietokantakysely Authors-tauluun.
+            //
+            // Include(a => a.Books)
+            // hakee mukaan myös kirjailijan kirjat,
+            // jotta niitä voidaan näyttää näkymässä.
+            //
+            // AsQueryable() mahdollistaa kyselyn muokkaamisen myöhemmin,
+            // esimerkiksi lisäämällä Where-ehtoja.
             var authorQuery = db.Authors
                 .Include(a => a.Books)
                 .AsQueryable();
 
+            // Tarkistetaan että hakusana ei ole tyhjä,
+            // null tai pelkkiä välilyöntejä
             if (!string.IsNullOrWhiteSpace(query))
             {
+                // Lisätään tietokantakyselyyn hakuehdot.
+                //
+                // Contains(query)
+                // hakee kaikki kirjailijat,
+                // joiden etu- tai sukunimi sisältää hakusanan.
+                //
+                // Lisäksi haetaan koko nimellä:
+                // "Firstname + Surname"
                 authorQuery = authorQuery.Where(a =>
                     a.Firstname.Contains(query) ||
                     a.Surname.Contains(query) ||
                     (a.Firstname + " " + a.Surname).Contains(query));
             }
+            // Suoritetaan tietokantakysely
+            // ja muutetaan tulokset listaksi.
             var results = await authorQuery.ToListAsync();
 
+            // PartialView palauttaa vain yhden osan HTML-sivusta,
+            // ei koko näkymää.
+            //
+            // "_AuthorsTable" sisältää vain päivitettävän taulukon.
+            //
+            // JavaScript vastaanottaa tämän HTML:n
+            // ja päivittää sivun sisällön ilman reloadia.
             return PartialView("_AuthorsTable", results); //palauttaa vain osan näkymästä, joka päivitetään AJAX-kutsulla
         }
     }

@@ -30,6 +30,7 @@ namespace PublishingHouseApp.Controllers // tämä on oletuscontrolleri
             return View(latestBooks); //Lähettää haetut kirjat näkymään Index-sivulle
         }
 
+        // GET: /Home/Privacy EI KÄYTÖSSÄ
         public IActionResult Privacy() //public = metodi on julkinen, eli sitä voidaan kutsua luokan ulkopuolelta
                                        //IActionResult = metodin palautustyyppi. Se kertoo, että metodi palauttaa jonkin MVC-toiminnon tuloksen, esimerkiksi näkymän (View).
         {                               //Privacy() = metodin nimi. Tämä metodi käsittelee yleensä /Privacy-sivun.

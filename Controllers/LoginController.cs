@@ -1,15 +1,16 @@
 ﻿using Microsoft.AspNetCore.Identity; // Tuo käyttöön ASP.NET Core Identity -kirjaston.Sen avulla voidaan hallita käyttäjiä, salasanoja, kirjautumista ja uloskirjautumista.Tästä tulee käyttöön esimerkiksi UserManager ja SignInManager.
 using Microsoft.AspNetCore.Mvc;//Tuo käyttöön MVC-toiminnot.Tarvitaan, jotta controller voi palauttaa näkymiä (View) ja uudelleenohjauksia (RedirectToAction).
-using Microsoft.DotNet.Scaffolding.Shared.CodeModifier.CodeChange;
-using PublishingHouseApp.Models;// Tuo käyttöön projektin omat mallit.controller käyttää mm: ApplicationUserRegisterViewModelLnViewModel
-
-namespace PublishingHouseApp.Controllers // Määrittää, että tämä luokka kuuluu Controllers-kansioon / nimeämisalueeseen.MVC löytää controllerit tästä namespace-alueesta.
+using PublishingHouseApp.Models;// Tuo käyttöön projektin omat mallit, kuten ApplicationUser, RegisterViewModel ja LoginViewModel.
+namespace PublishingHouseApp.Controllers // Määrittää luokan nimeämisalueen ja järjestää controllerit projektissa loogisesti. 
 {
-    public class AccountController : Controller //luodaan Account controlleri. vastaa käyttäjätunnuksii liittyvistä toiminnoista: rekisteröityminen, kirjautuminen, uloskirjaituminen.
+    public class AccountController : Controller // AccountController vastaa käyttäjätiliin liittyvistä toiminnoista:
+                                                // rekisteröitymisestä, kirjautumisesta ja uloskirjautumisesta.
     {
-        private readonly UserManager<ApplicationUser> _userManager;//tallentaa olion jonka avulla voidaan hallita käyttäjiä tietokannassa; _userManager osaa esim. luoda käyttäjän, etsiä käyttän, vaihtAA salasanan, tarkistaa käyttäjän tiedot
-        private readonly SignInManager<ApplicationUser> _signInManager; // Tallentaa olion, joka vastaa kirjautumisesta ja uloskirjautumisesta. _signInManager osaa esim, kirjata käyttäjän sisäänkirjata käyttäjän ulos, tarkistaa salasanan
-
+        private readonly UserManager<ApplicationUser> _userManager;// Tallentaa UserManager-olion, jonka avulla käyttäjiä voidaan luoda,
+                                                                   // hakea ja hallita tietokannassa.
+        private readonly SignInManager<ApplicationUser> _signInManager; // Tallentaa SignInManager-olion, joka vastaa kirjautumisesta,
+                                                                        // uloskirjautumisesta ja salasanan tarkistamisesta. 
+       
         //Tämä on controllerin konstruktori. ASP.NET Core lähettää tänne automaattisesti(Dependency Injection) valmiit UserManager-ja SignInManager-oliot.
         public AccountController(
             UserManager<ApplicationUser> userManager,
@@ -28,6 +29,7 @@ namespace PublishingHouseApp.Controllers // Määrittää, että tämä luokka k
         }
 
         [HttpPost] //Kertoo, että seuraava metodi reagoi lomakkeen lähettämiseen. POST tarkoittaa, että käyttäjä lähettää tietoao palvelimelle.
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterViewModel model)//Tämä metodi suoritetaan, kun rekisteröintilomake lähetetään.MVC ottaa lomakkeelta tiedot ja sijoittaa ne RegisterViewModel-olioon.esim:model.Email,model.Password
         {
             if (!ModelState.IsValid)
@@ -61,8 +63,10 @@ namespace PublishingHouseApp.Controllers // Määrittää, että tämä luokka k
             return View();//Palauttaa näkymän:Views/Account/Login.cshtml
         }
 
+        
         [HttpPost]
-        public async Task<IActionResult> Login(LoginViewModel model)//Tämä suoritetaan, kun käyttäjä painaa "Kirjaudu sisään" -painiketta.Lomakkeen tiedot sijoitetaan LoginViewModel-olioon.
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Login(LoginViewModel model)//Tämä suoritetaan, kun käyttäjä painaa "Login" -painiketta.Lomakkeen tiedot sijoitetaan LoginViewModel-olioon.
         {
             if (!ModelState.IsValid)//Jos käyttäjä ei täyttänyt kaikkia kenttiä oikein:
                 return View(model);//avaa krijautumissiuvn uudelleen ja näyttää vriheet
@@ -83,7 +87,8 @@ namespace PublishingHouseApp.Controllers // Määrittää, että tämä luokka k
         }
 
         [HttpPost]
-        public async Task<IActionResult> Logout()//Tämä metodi suoritetaan, kun käyttäjä painaa "Kirjaudu ulos". Se vastaanottaa POST-pyynnön esimerkiksi napista.
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Logout()//Tämä metodi suoritetaan, kun käyttäjä painaa "Logout". Se vastaanottaa POST-pyynnön esimerkiksi napista.
         {
             await _signInManager.SignOutAsync();//Poistaa käyttäjän kirjautumisen.Käyttäjän kirjautumiscookie poistetaan.
             return RedirectToAction("Index", "Home");//Uloskirjautumisen jälkeen käyttäjä ohjataan takaisin etusivulle.

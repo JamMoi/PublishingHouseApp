@@ -1,20 +1,25 @@
-﻿@model IEnumerable<PublishingHouseApp.Models.Author>
-@* Tämä kertoo Razorille, että näkymä saa malliksi Author-olioiden listan.
-   IEnumerable<Author> = luettelo kirjailijoista.
-   Tämä luettelo tulee suoraan controllerista, esim:
-   return View(await db.Authors.ToListAsync());
-*@
-
+﻿@model PublishingHouseApp.Models.PaginatedList<PublishingHouseApp.Models.Author> 
 @{
-    ViewData["Title"] = "Authors"; @* Html-sivun otsikko *@
+    ViewData["Title"] = "Authors";
 }
 
 <h1>Authors</h1> @* Sivun näkyvä otsikko *@
 
 @* Hakukenttä kirjailijoiden live-hakua varten *@
-<div class="mb-3">
-    <input type="text" id="authorSearch" class="form-control" placeholder="Search authors..." />
-</div>
+<form class="search-form mb-4"> 
+    <div class="input-group">
+                <input type="text"
+                    id="authorSearch"
+                    class="form-control"
+                    placeholder="Search Authors..." />
+
+                <button type="button" 
+                    id="authorSearchButton"
+                    class="btn btn-primary">
+                    Search
+                </button>
+    </div>
+</form>
 
 @* 🔒 Vain admin näkee uuden kirjailijan lisäysnapin *@
 @if (User.IsInRole("Admin"))
@@ -32,27 +37,70 @@
 <div id="authorsTableContainer">
     @await Html.PartialAsync("_AuthorsTable", Model)
 </div>
+@if (Model != null && Model.TotalPages > 1)
+{
+    <nav>
+        <ul class="pagination justify-content-center mt-4">
 
-<script>
-    // Haetaan hakukenttä ja taulukon container JavaScriptiä varten
-    const authorSearchInput = document.getElementById("authorSearch");
-    const authorsTableContainer = document.getElementById("authorsTableContainer");
+            @if (Model.HasPreviousPage)
+            {
+                <li class="page-item">
+                    <a class="page-link"
+                           asp-action="Index"
+                           asp-route-pageNumber="@(Model.PageIndex - 1)">
+                        Previous
+                    </a>
+                </li>
+            }
+            else
+            {
+                <li class="page-item disabled">
+                    <span class="page-link">Previous</span>
+                </li>
+            }
 
-    let debounceTimer; // viivästää hakua, ettei pyyntö lähde jokaisesta näppäimestä heti
+            @for (int i = 1; i <= Model.TotalPages; i++)
+            {
+                if (i == Model.PageIndex)
+                {
+                    <li class="page-item active">
+                        <span class="page-link">@i</span>
+                    </li>
+                }
+                else
+                {
+                    <li class="page-item">
+                        <a class="page-link"
+                               asp-action="Index"
+                               asp-route-pageNumber="@i">
+                            @i
+                        </a>
+                    </li>
+                }
+            }
 
-    // Kun käyttäjä kirjoittaa hakukenttään, tehdään AJAX-haku viiveellä
-    authorSearchInput.addEventListener("keyup", function () {
-        clearTimeout(debounceTimer);
+            @if (Model.HasNextPage)
+            {
+                <li class="page-item">
+                    <a class="page-link"
+                           asp-action="Index"
+                           asp-route-pageNumber="@(Model.PageIndex + 1)">
+                        Next
+                    </a>
+                </li>
+            }
+            else
+            {
+                <li class="page-item disabled">
+                    <span class="page-link">Next</span>
+                </li>
+            }
 
-        debounceTimer = setTimeout(async () => {
-            const query = authorSearchInput.value;
+        </ul>
+    </nav>
+}
 
-            // Kutsuu AuthorsControllerin LiveSearch-metodia
-            const response = await fetch(`/Authors/LiveSearch?query=${encodeURIComponent(query)}`);
 
-            // Palautettu HTML sijoitetaan taulukon tilalle
-            const html = await response.text();
-            authorsTableContainer.innerHTML = html;
-        }, 300);
-    });
-</script>
+@section Scripts{
+    <script src="~/js/author.js"></script>
+}

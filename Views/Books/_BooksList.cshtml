@@ -1,0 +1,181 @@
+﻿@* Tämä PartialView ottaa vastaan listan Book-olioita
+   Lista tulee yleensä BooksControllerista esimerkiksi Index- tai hakutoiminnon kautta *@
+
+@model IEnumerable<PublishingHouseApp.Models.Book>
+
+@* Tarkistetaa, onko kirjautunut käyttäjä Admin-roolissa *@
+@if (User.IsInRole("Admin"))
+{
+    @* Jos käyttäjä on Admin, näytettää painikkeen uuden kirjan lisäämiseen
+       Pyyntö menee BooksControllerin Create-actioniin *@
+    <p>
+        <a asp-action="Create" asp-controller="Books" class="btn btn-success">
+            <i class="bi bi-plus-circle"></i> Add New Book
+        </a>
+    </p>
+    @* Näyttää Adminille kirjat taulukkomuodossa *@
+    <table class="table table-striped table-hover">
+        <thead>
+            <tr>
+                <th>ISBN</th>
+                <th>Title</th>
+                <th>Editor</th>
+                <th>Published Date</th>
+                <th>Edition</th>
+                <th>Genre</th>
+                <th>Language</th>
+                <th>Keywords</th>
+                <th>Page Count</th>
+                <th>Format</th>
+                <th>File Path</th>
+                <th>Cover Image Url</th>
+                <th>Price</th>
+                <th>Available</th>
+                <th>Author</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @* Tarkistaa, että Model ei ole tyhjä ja että siinä on kirjoja *@
+
+            @if (Model != null && Model.Any())
+            {
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        @* Tulostetaan kirjan tiedot taulukon soluihin *@
+                        <td>@item.Isbn</td>
+                        <td>@item.Title</td>
+                        <td>@item.Editor</td>
+                        <td>@item.PublishedDate</td>
+                        <td>@item.Edition</td>
+                        <td>
+                            @* Jos kirjalla on genrejä, ne yhdistetään pilkulla erotetuksi tekstiksi.
+                               Muuten näytettää "No genre". *@
+                            @(item.BookGenres != null && item.BookGenres.Any()
+                                ? string.Join(", ", item.BookGenres.Select(bg => bg.Genre.Name))
+                                : "No genre")
+                        </td>
+                        <td>@item.Language</td>
+                        <td>@item.Keywords</td>
+                        <td>@item.PageCount</td>
+                        <td>@item.Format</td>
+                        <td>@item.FilePath</td>
+                        <td>@item.CoverImageUrl</td>
+                        <td>@item.Price</td>
+                        <td>@item.IsAvailable</td>
+                        <td>
+                            @* Jos kirjalla on Author-olio, näytetään etunimi ja sukunimi
+                               Muuten näytetään "Unknown" *@
+                            @(item.Author != null
+                                ? item.Author.Firstname + " " + item.Author.Surname
+                                : "Unknown")
+                        </td>
+                        <td>
+                            <div class="d-flex flex-wrap gap-2">
+                                @* Details-linkki lähettää pyynnön Details-actioniin
+                                   Kirjan BookId lähetetään reittiparametrina id:ll. *@
+                                <a asp-action="Details" asp-route-id="@item.BookId" class="btn btn-info btn-sm">
+                                    <i class="bi bi-eye-fill"></i> Details
+                                </a>
+                                @* Edit-linkki lähettää pyynnön Edit-actioniin kyseisen kirjan id:llä. *@
+
+                                <a asp-action="Edit" asp-route-id="@item.BookId" class="btn btn-primary btn-sm">
+                                    <i class="bi bi-pencil-fill"></i> Edit
+                                </a>
+                                @* Delete-linkki lähettää pyynnön Delete-actioniin kyseisen kirjan id:llä. *@
+                                <a asp-action="Delete" asp-route-id="@item.BookId" class="btn btn-danger btn-sm">
+                                    <i class="bi bi-trash-fill"></i> Delete
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                @* Jos kirjoja ei löydy, näytetään ilmoitus koko taulukon levyisenä *@
+                <tr>
+                    <td colspan="16" class="text-center">No books found.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    @* Jos käyttäjä ei ole Admin, näytettää kirjat kortteina *@
+
+    <div class="row">
+        @* Tarkistetaan, että Modelissa on kirjoja *@
+        @if (Model != null && Model.Any())
+        {
+            @* Käy jokaisen kirja läpi ja tekee kirjasta oman kortin *@
+            @foreach (var item in Model)
+            {
+                <div class="col-md-4 col-lg-3 mb-4">
+                    <div class="card h-100 shadow-sm book-card">
+                        @* Jos kirjalla on kansikuvan tiedosto, näyttää kuvan
+                           Hakee kuvan wwwroot/images-kansiosta. *@
+                        @if (!string.IsNullOrWhiteSpace(item.CoverImageUrl))
+                        {
+                            <div class="book-cover-wrapper">
+                                <img src="@Url.Content("~/images/" + item.CoverImageUrl)"
+                                     class="book-cover"
+                                     alt="@item.Title" />
+                            </div>
+                        }
+                        else
+                        {
+                            @* Jos kansikuvaa ei ole, näytetään teksti *@
+                            <div class="book-cover-wrapper">
+                                <span>No cover image</span>
+                            </div>
+                        }
+
+                        <div class="card-body">
+                            @* Näytettää kirjan nimen *@
+
+                            <h5 class="card-title">@item.Title</h5>
+
+                            <p class="card-text">
+                                <strong>Author:</strong>
+                                @* Näyttää kirjailija, jos tieto löytyy. *@
+
+                                @(item.Author != null
+                                    ? item.Author.Firstname + " " + item.Author.Surname
+                                    : "Unknown")
+                            </p>
+
+                            <p class="card-text">
+                                <strong>Genre:</strong>
+                                @* Näytetyää kirjan genret tai "No genre". *@
+                                @(item.BookGenres != null && item.BookGenres.Any()
+                                    ? string.Join(", ", item.BookGenres.Select(bg => bg.Genre.Name))
+                                    : "No genre")
+                            </p>
+
+                            <p class="card-text">
+                                <strong>Price:</strong> @item.Price €
+                            </p>
+                            @* Details-linkki lähettää pyynnön Details-actioniin.
+                               Mukaan annetaan kirjan BookId id-parametrina *@
+                            <a asp-action="Details" asp-route-id="@item.BookId" class="btn btn-info btn-sm">
+                                <i class="bi bi-eye-fill"></i> Details
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            @* Jos kirjoja ei löydy, näyttää ilmoituksen *@
+
+            <div class="col-12 text-center">
+                <p>No books found.</p>
+            </div>
+        }
+    </div>
+}

@@ -13,41 +13,34 @@
 </head>
 <body>
     <header>
-        <a class="nav-link text-dark" asp-controller="Account" asp-action="Login">Login</a>
-        <a class="nav-link text-dark" asp-controller="Account" asp-action="Register">Register</a>
-
-        @if (User.Identity != null && User.Identity.IsAuthenticated)
-        {
-            <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
-                <button type="submit" class="btn btn-link nav-link" style="display:inline; padding:0;">Logout</button>
-            </form>
-        }
-        else
-        {
-            <a class="nav-link text-dark" asp-controller="Account" asp-action="Login">Login</a>
-            <a class="nav-link text-dark" asp-controller="Account" asp-action="Register">Register</a>
-        }
-
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm border-bottom box-shadow mb-3">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">PublishingHouseApp</a>
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
+                    PublishingHouseApp
+                </a>
 
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse"
+                        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
+
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Authors" asp-action="Index">Authors</a>
+                            <a class="nav-link" asp-area="" asp-controller="Authors" asp-action="Index">Authors</a>
                         </li>
+
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Books" asp-action="Index">Books</a>
+                            <a class="nav-link" asp-area="" asp-controller="Books" asp-action="Index">Books</a>
                         </li>
+                        
+                        
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle text-dark" href="#" id="companyDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <a class="nav-link dropdown-toggle" href="#" id="companyDropdown" role="button"
+                                   data-bs-toggle="dropdown" aria-expanded="false">
                                 Company
                             </a>
+
                             <ul class="dropdown-menu" aria-labelledby="companyDropdown">
                                 <li>
                                     <a class="dropdown-item" asp-controller="Company" asp-action="Index">About Us</a>
@@ -57,8 +50,30 @@
                                 </li>
                             </ul>
                         </li>
-                        
-                        </ul>
+                    </ul>
+
+                    <ul class="navbar-nav">
+                        @if (User.Identity != null && User.Identity.IsAuthenticated)
+                        {
+                            <li class="nav-item">
+                                <form asp-controller="Account" asp-action="Logout" method="post">
+                                    <button type="submit" class="btn btn-link nav-link">
+                                        Logout
+                                    </button>
+                                </form>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Account" asp-action="Login">Login</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Account" asp-action="Register">Register</a>
+                            </li>
+                        }
+                    </ul>
                 </div>
             </div>
         </nav>
