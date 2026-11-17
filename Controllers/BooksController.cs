@@ -479,23 +479,66 @@ namespace PublishingHouseApp.Controllers
                     .ThenInclude(bg => bg.Genre)
                 .AsQueryable();
 
-            // Jos hakusana ei ole tyhjä,
-            // lisätään hakuehto kirjan nimeen ja ISBN-numeroon.
+            // Tarkistaa ensin onko käyttäjä kirjoittanut jotain hakukenttään
+            // string.IsNullOrWhiteSpace(query) palauttaa true, jos:
+            // - query on null
+            // - query on tyhjä merkkijono ""
+            // - query sisältää vain välilyöntejä
+            //
+            // Haku tehdään vain silloin, kun hakusana oikeasti sisältää tekstiä
             if (!string.IsNullOrWhiteSpace(query))
             {
+                // Lisätään booksQuery-kyselyyn Where-ehto.
+                //
+                // Where rajaa tietokannasta haettavia kirjoja.
+                // Tähän jäävät vain ne kirjat, joiden Title tai Isbn vastaa hakusanaa.
                 booksQuery = booksQuery.Where(b =>
+                    // EF.Functions.Like on Entity Frameworkin SQL LIKE -haku
+                    //
+                    // Se muuttuu tietokannassa suunnilleen tällaiseksi SQL-ehdoksi:
+                    // WHERE Title LIKE '%hakusana%'
+                    //
+                    // % merkki tarkoittaa:
+                    // "ennen tai jälkeen voi olla mitä tahansa merkkejä"
+                    //
+                    // Esimerkiksi jos query on "cat",
+                    // tämä löytää kirjan nimeltä:
+                    // "The Black Cat"
+                    // koska sana "cat" löytyy otsikon sisältä
                     EF.Functions.Like(b.Title, $"%{query}%") ||
+
+                    // Tämä tekee saman haun ISBN-kentästä.
+                    //
+                    // Jos query on esimerkiksi "978",
+                    // tämä löytää kirjat, joiden ISBN sisältää merkit 978.
+                    //
+                    // || tarkoittaa OR eli "tai".
+                    // Kirja hyväksytään tuloksiin, jos joko Title TAI Isbn täsmää hakusanaan
                     EF.Functions.Like(b.Isbn, $"%{query}%"));
             }
 
-            // Suoritetaan kysely ja muutetaan tulokset listaksi.
+            // Tässä vaiheessa booksQuery sisältää joko:
+            // - kaikki kirjat, jos hakusana oli tyhjä
+            // - vain hakua vastaavat kirjat, jos hakusana annettiin
+            //
+            // AsNoTracking() tekee hausta kevyemmän,
+            // koska tuloksia vain näytetään eikä muokata
+            //
+            // ToListAsync() suorittaa tietokantakyselyn oikeasti
+            // ja muuttaa tulokset C#-listaksi
             var results = await booksQuery
                 .AsNoTracking()
                 .ToListAsync();
 
-            // Palautetaan vain osittainen näkymä,
-            // ei koko sivua.
-            // JavaScript päivittää tämän avulla kirjalistan.
+            // Palautetaan Partial View eli vain osa sivun HTML:stä
+            //
+            // "_BooksList" on partial view,
+            // joka näyttää kirjat joko adminille taulukkona
+            // tai käyttäjälle kortteina
+            //
+            // Tämä ei lataa koko sivua uudelleen.
+            // JavaScript vastaanottaa tämän HTML:n
+            // ja vaihtaa sillä kirjalistan sisällön sivulla
             return PartialView("_BooksList", results);
         }
     }

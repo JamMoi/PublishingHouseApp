@@ -33,7 +33,7 @@ namespace PublishingHouseApp.Controllers
             // Rakennetaan tietokantakysely (ei vielä suoriteta!)
             // Include = ladataan myös kirjailijan kirjat mukaan
             // AsNoTracking = nopeampi, koska dataa ei muokata
-            var authors = db.Authors
+            var authors = db.Authors.OrderBy(a => a.Surname) //järjestetään sukunimen mukaan aakk
                 .Include(a => a.Books)
                 .AsNoTracking();
 

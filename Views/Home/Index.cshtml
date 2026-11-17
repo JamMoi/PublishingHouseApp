@@ -29,7 +29,12 @@
 
                 <h2 class="text-center mb-4">Latest Available Books</h2>
 
-                <div id="bookCarousel" class="carousel slide" data-bs-ride="carousel">
+                <div id="bookCarousel" 
+                    class="carousel slide" 
+                    data-bs-ride="carousel"
+                    data-bs-interval="3000"
+                    data-bs-pause="false">
+
                     <div class="carousel-inner">
                         @for (int i = 0; i < books.Count; i++)
                         {
@@ -47,11 +52,7 @@
                                              class="img-fluid rounded-4 shadow"
                                              alt="@book.Title"
                                              style="max-height: 420px; object-fit: contain;" />
-        <!--debuggaus, yksi kansikuvista ei  näy--->
-                                        <div class="mt-2 small text-muted">
-                                            <p><strong>CoverImageUrl:</strong> @book.CoverImageUrl</p>
-                                            <p><strong>Final imageUrl:</strong> @imageUrl</p>
-                                        </div>
+        
                                     </div>
 
                                     <div class="col-md-6">

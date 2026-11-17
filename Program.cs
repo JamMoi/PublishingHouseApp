@@ -13,45 +13,51 @@ var builder = WebApplication.CreateBuilder(args); //t‰ss‰ luodaan olio, johon li
 
 // lis‰t‰‰n palvelut sovellukseen
 builder.Services.AddControllersWithViews(); //rekisterˆid‰‰n MVC-palvelut, jotta voidaan k‰ytt‰‰ ohjaimia ja n‰kymi‰
+
+// Lis‰t‰‰n tietokantapalvelu ja m‰‰ritet‰‰n SQL Server -yhteys stringist‰ appsettings.json
 builder.Services.AddDbContext<PublishingHouseContext>(options => 
-options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))); //specifying the server to connect to the database
+options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))); 
 
 // Idnentity Frameworkin ja ASP.NET Identityn konfigurointi
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {
-    options.Password.RequireDigit = true;
-    options.Password.RequireLowercase = true;
-    options.Password.RequireUppercase = false;
-    options.Password.RequireNonAlphanumeric = false;
-    options.Password.RequiredLength = 6;
+    options.Password.RequireDigit = true; // Salasanassa on oltava numero
+    options.Password.RequireLowercase = true;// Pienikirjain pakollinen
+    options.Password.RequireUppercase = false; // Ei pakollista isoja kirjaimia
+    options.Password.RequireNonAlphanumeric = false;// Erikoismerkki‰ ei vaadita
+    options.Password.RequiredLength = 6; // Minimipituus 6 merkki‰
 
-    options.SignIn.RequireConfirmedAccount = false;
+    options.SignIn.RequireConfirmedAccount = false; // Ei vaadi vahvistettua tili‰ kirjautumiseen
 })
-.AddEntityFrameworkStores<PublishingHouseContext>()
-.AddDefaultTokenProviders();
+.AddEntityFrameworkStores<PublishingHouseContext>()// K‰ytet‰‰n tietokantaa k‰ytt‰jien ja roolien tallentamiseen
+.AddDefaultTokenProviders(); // Tarjoaa valmiit tokenit esimerkiksi salasanojen palautukseen
 
-builder.Services.AddRazorPages();
+builder.Services.AddRazorPages(); // Mahdollistaa Razor Pages -n‰kym‰t
 
 
-var app = builder.Build(); //Rakennetaan varsinainen sovellus k‰ytt‰en edell‰ lis‰ttyj‰ palveluita.
+var app = builder.Build(); //Rakennetaan varsinainen sovellus k‰ytt‰en edell‰ lis‰ttyj‰ palveluita
 
-using (var scope = app.Services.CreateScope())
+using (var scope = app.Services.CreateScope())// Luo scope, jotta voidaan k‰ytt‰‰ palveluita alustuksessa
+
 {
     var services = scope.ServiceProvider;
 
-    var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
-    var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
+   
+    var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>(); // Haetaan roolien hallinta
+    var userManager = services.GetRequiredService<UserManager<ApplicationUser>>(); // Haetaan k‰ytt‰jien hallinta
 
+    // Luodaan perusroolit
     string[] roles = { "Admin", "User" };
 
     foreach (var role in roles)
     {
-        if (!await roleManager.RoleExistsAsync(role))
+        if (!await roleManager.RoleExistsAsync(role)) // Jos roolia ei ole viel‰ olemassa
         {
-            await roleManager.CreateAsync(new IdentityRole(role));
+            await roleManager.CreateAsync(new IdentityRole(role));// Luodaan rooli
         }
     }
 
+    // Lis‰t‰‰n admin-k‰ytt‰j‰ Admin-rooliin
     var adminEmail = "admin@test.com";
     var adminUser = await userManager.FindByEmailAsync(adminEmail);
 
@@ -59,19 +65,20 @@ using (var scope = app.Services.CreateScope())
     {
         if (!await userManager.IsInRoleAsync(adminUser, "Admin"))
         {
-            await userManager.AddToRoleAsync(adminUser, "Admin");
+            await userManager.AddToRoleAsync(adminUser, "Admin");// Lis‰t‰‰n admin-rooli
         }
     }
 }
-// Dummy-data
+// Alustetaan dummy-data tietokantaan
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     var context = services.GetRequiredService<PublishingHouseContext>();
-    DbInitializer.Initialize(context);
+    DbInitializer.Initialize(context);// T‰ytt‰‰ tietokannan esimerkkidatalla
 
 }
-    if (!app.Environment.IsDevelopment())
+    if (!app.Environment.IsDevelopment())// Virheenk‰sittely tuotantoymp‰ristˆss‰
+
 {
     app.UseExceptionHandler("/Home/Error"); // virheiden korjaus tuotannossa; ohjee virheet error sivulle
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
